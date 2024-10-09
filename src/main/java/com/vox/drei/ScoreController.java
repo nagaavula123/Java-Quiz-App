@@ -11,8 +11,10 @@ import java.util.List;
 
 public class ScoreController {
 
+    @FXML private Label quizNameLabel;
     @FXML private Label scoreLabel;
     private List<Question> questions;
+    private String quizName;
 
     public void setScore(int score, int totalQuestions) {
         scoreLabel.setText(String.format("Your Score: %d out of %d", score, totalQuestions));
@@ -20,6 +22,11 @@ public class ScoreController {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public void setQuizName(String quizName) {
+        this.quizName = quizName;
+        quizNameLabel.setText("Quiz: " + quizName);
     }
 
     @FXML
@@ -44,7 +51,7 @@ public class ScoreController {
 
         Scene answerScene = new Scene(answerBox, 400, 600);
         answerStage.setScene(answerScene);
-        answerStage.setTitle("Quiz Answers");
+        answerStage.setTitle("Quiz Answers - " + quizName);
         answerStage.show();
     }
 

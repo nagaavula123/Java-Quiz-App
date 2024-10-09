@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class DreiMain extends Application {
 
     private static Stage primaryStage;
@@ -21,7 +23,7 @@ public class DreiMain extends Application {
     }
 
     public static void showView(String fxmlFile) throws Exception {
-        Parent root = FXMLLoader.load(DreiMain.class.getResource(fxmlFile));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(DreiMain.class.getResource(fxmlFile)));
         primaryStage.setTitle("Quiz Game");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();

@@ -6,17 +6,22 @@ public class DreiController {
 
     @FXML
     private void startQuiz() throws Exception {
-        DreiMain.showView("QuizGameView.fxml");
+        DreiMain.showView("QuizSelectionView.fxml");
     }
 
     @FXML
-    private void openSettings() throws Exception {
-        DreiMain.showView("QuizSettingsView.fxml");
+    private void manageQuizzes() throws Exception {
+        DreiMain.showView("ManageQuizzesView.fxml");
     }
 
     @FXML
     private void manageQuestions() throws Exception {
         DreiMain.showView("ManageQuestionsView.fxml");
+    }
+
+    @FXML
+    private void openSettings() throws Exception {
+        DreiMain.showView("QuizSettingsView.fxml");
     }
 
     @FXML

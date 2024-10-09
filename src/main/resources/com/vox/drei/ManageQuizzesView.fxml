@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.ManageQuizzesController"
+      spacing="10" alignment="CENTER" stylesheets="@styles.css">
+    <Label text="Manage Quizzes" styleClass="title"/>
+    <TableView fx:id="quizzesTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="Quiz Name" prefWidth="300"/>
+            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="200"/>
+        </columns>
+    </TableView>
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Add New Quiz" onAction="#addNewQuiz"/>
+        <Button text="Back to Main Menu" onAction="#backToMain"/>
+    </HBox>
+</VBox>

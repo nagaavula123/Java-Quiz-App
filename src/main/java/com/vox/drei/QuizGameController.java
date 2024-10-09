@@ -23,12 +23,17 @@ public class QuizGameController {
     @FXML private GridPane answerGrid;
     @FXML private Label timerLabel;
 
+    private static Quiz currentQuiz;
     private List<Question> questions;
     private int currentQuestionIndex = 0;
     private int score = 0;
     private int timeRemaining;
     private Timeline timer;
     private Preferences prefs = Preferences.userNodeForPackage(QuizSettingsController.class);
+
+    public static void setCurrentQuiz(Quiz quiz) {
+        currentQuiz = quiz;
+    }
 
     @FXML
     public void initialize() {
@@ -42,10 +47,10 @@ public class QuizGameController {
     }
 
     private void loadQuestions() {
-        questions = QuestionDatabase.loadQuestions();
+        questions = QuestionDatabase.getQuestionsForQuiz(currentQuiz.getId());
         Collections.shuffle(questions);
-        int numQuestions = prefs.getInt("numQuestions", 5);
-        questions = questions.subList(0, Math.min(numQuestions, questions.size()));
+        int numQuestions = Math.min(prefs.getInt("numQuestions", 5), questions.size());
+        questions = questions.subList(0, numQuestions);
     }
 
     private void displayQuestion() {
@@ -142,6 +147,7 @@ public class QuizGameController {
             ScoreController scoreController = loader.getController();
             scoreController.setScore(score, questions.size());
             scoreController.setQuestions(questions);
+            scoreController.setQuizName(currentQuiz.getName());
 
             Scene scene = new Scene(root, 600, 400);
             DreiMain.getPrimaryStage().setScene(scene);
@@ -149,4 +155,5 @@ public class QuizGameController {
             e.printStackTrace();
         }
     }
+
 }

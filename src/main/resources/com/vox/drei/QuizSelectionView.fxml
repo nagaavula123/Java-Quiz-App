@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.QuizSelectionController"
+      spacing="10" alignment="CENTER" stylesheets="@styles.css">
+    <Label text="Select a Quiz" styleClass="title"/>
+    <ListView fx:id="quizListView" VBox.vgrow="ALWAYS"/>
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Start Selected Quiz" onAction="#startSelectedQuiz"/>
+        <Button text="Back to Main Menu" onAction="#backToMain"/>
+    </HBox>
+</VBox>

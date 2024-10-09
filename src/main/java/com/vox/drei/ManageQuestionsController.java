@@ -4,8 +4,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.collections.FXCollections;
+import javafx.stage.Stage;
+import javafx.scene.layout.GridPane;
+import javafx.geometry.Insets;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ManageQuestionsController {
 
@@ -53,23 +59,65 @@ public class ManageQuestionsController {
 
     private void editQuestion(int index) {
         Question question = questions.get(index);
-        // Open edit dialog
         boolean edited = openEditDialog(question);
         if (edited) {
-            QuestionDatabase.saveQuestions(questions);
+            QuestionDatabase.updateQuestion(question);
             loadQuestions(); // Refresh the table
         }
     }
 
     private boolean openEditDialog(Question question) {
-        // Implement edit dialog logic here
-        // Return true if the question was edited, false otherwise
-        return false; // Placeholder
+        Dialog<Question> dialog = new Dialog<>();
+        dialog.setTitle("Edit Question");
+        dialog.setHeaderText("Edit the question and its answers");
+
+        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField questionField = new TextField(question.getQuestion());
+        List<TextField> answerFields = question.getAnswers().stream()
+                .map(TextField::new)
+                .collect(Collectors.toList());
+        ComboBox<Integer> correctAnswerComboBox = new ComboBox<>(FXCollections.observableArrayList(
+                IntStream.range(0, question.getAnswers().size()).boxed().collect(Collectors.toList())
+        ));
+        correctAnswerComboBox.getSelectionModel().select(question.getCorrectAnswerIndex());
+
+        grid.add(new Label("Question:"), 0, 0);
+        grid.add(questionField, 1, 0);
+        for (int i = 0; i < answerFields.size(); i++) {
+            grid.add(new Label("Answer " + (i + 1) + ":"), 0, i + 1);
+            grid.add(answerFields.get(i), 1, i + 1);
+        }
+        grid.add(new Label("Correct Answer:"), 0, answerFields.size() + 1);
+        grid.add(correctAnswerComboBox, 1, answerFields.size() + 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                question.setQuestion(questionField.getText());
+                for (int i = 0; i < answerFields.size(); i++) {
+                    question.getAnswers().set(i, answerFields.get(i).getText());
+                }
+                question.setCorrectAnswerIndex(correctAnswerComboBox.getValue());
+                return question;
+            }
+            return null;
+        });
+
+        Optional<Question> result = dialog.showAndWait();
+        return result.isPresent();
     }
 
     private void deleteQuestion(int index) {
-        questions.remove(index);
-        QuestionDatabase.saveQuestions(questions);
+        Question question = questions.get(index);
+        QuestionDatabase.deleteQuestion(question.getId());
         loadQuestions(); // Refresh the table
     }
 
