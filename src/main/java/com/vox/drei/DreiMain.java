@@ -24,7 +24,7 @@ public class DreiMain extends Application {
 
     public static void showView(String fxmlFile) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(DreiMain.class.getResource(fxmlFile)));
-        primaryStage.setTitle("Quiz Game");
+        primaryStage.setTitle("Drei Quiz Game");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
     }

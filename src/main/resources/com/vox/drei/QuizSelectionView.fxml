@@ -2,13 +2,17 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.QuizSelectionController"
-      spacing="10" alignment="CENTER" stylesheets="@styles.css">
+      spacing="20" alignment="CENTER" stylesheets="@styles.css">
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40"/>
+    </padding>
     <Label text="Select a Quiz" styleClass="title"/>
     <ListView fx:id="quizListView" VBox.vgrow="ALWAYS"/>
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Start Selected Quiz" onAction="#startSelectedQuiz"/>
-        <Button text="Back to Main Menu" onAction="#backToMain"/>
+    <HBox spacing="20" alignment="CENTER">
+        <Button text="Start Selected Quiz" onAction="#startSelectedQuiz" styleClass="primary-button"/>
+        <Button text="Back to Main Menu" onAction="#backToMain" styleClass="secondary-button"/>
     </HBox>
 </VBox>

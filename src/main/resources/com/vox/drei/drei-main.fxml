@@ -2,13 +2,16 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.DreiController"
       spacing="20" alignment="CENTER" stylesheets="@styles.css">
-    <Label text="Quiz Game" styleClass="title"/>
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40"/>
+    </padding>
+    <Label text="Drei Quiz Game" styleClass="title"/>
     <Button text="Start Quiz" onAction="#startQuiz" styleClass="menu-button"/>
     <Button text="Manage Quizzes" onAction="#manageQuizzes" styleClass="menu-button"/>
-    <Button text="Manage Questions" onAction="#manageQuestions" styleClass="menu-button"/>
     <Button text="Quiz Settings" onAction="#openSettings" styleClass="menu-button"/>
     <Button text="Exit" onAction="#exitGame" styleClass="menu-button"/>
 </VBox>

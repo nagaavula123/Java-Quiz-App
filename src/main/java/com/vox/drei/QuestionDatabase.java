@@ -1,7 +1,7 @@
 package com.vox.drei;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import  com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class QuestionDatabase {
-    private static final String QUESTIONS_FILE = "src/main/resources/questions.json";
-    private static final String QUIZZES_FILE = "src/main/resources/quizzes.json";
+    private static final String QUESTIONS_FILE = "questions.json";
+    private static final String QUIZZES_FILE = "quizzes.json";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static List<Question> loadQuestions() {
@@ -52,6 +52,13 @@ public class QuestionDatabase {
         List<Question> questions = loadQuestions();
         questions.removeIf(q -> q.getId().equals(questionId));
         saveQuestions(questions);
+
+        // Remove the question from all quizzes
+        List<Quiz> quizzes = loadQuizzes();
+        for (Quiz quiz : quizzes) {
+            quiz.removeQuestionId(questionId);
+        }
+        saveQuizzes(quizzes);
     }
 
     public static List<Quiz> loadQuizzes() {

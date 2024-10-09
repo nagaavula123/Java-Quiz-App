@@ -117,13 +117,26 @@ public class ManageQuestionsController {
 
     private void deleteQuestion(int index) {
         Question question = questions.get(index);
-        QuestionDatabase.deleteQuestion(question.getId());
-        loadQuestions(); // Refresh the table
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Question");
+        alert.setHeaderText("Are you sure you want to delete this question?");
+        alert.setContentText("This action cannot be undone.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            QuestionDatabase.deleteQuestion(question.getId());
+            loadQuestions(); // Refresh the table
+        }
     }
 
     @FXML
-    private void addNewQuestion() throws Exception {
-        DreiMain.showView("AddQuestionView.fxml");
+    private void addNewQuestion() {
+        Question newQuestion = new Question("New Question", List.of("Answer 1", "Answer 2", "Answer 3", "Answer 4"), 0);
+        boolean edited = openEditDialog(newQuestion);
+        if (edited) {
+            QuestionDatabase.addQuestion(newQuestion);
+            loadQuestions(); // Refresh the table
+        }
     }
 
     @FXML

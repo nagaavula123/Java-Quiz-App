@@ -2,9 +2,13 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.ManageQuizzesController"
       spacing="10" alignment="CENTER" stylesheets="@styles.css">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
     <Label text="Manage Quizzes" styleClass="title"/>
     <TableView fx:id="quizzesTable" VBox.vgrow="ALWAYS">
         <columns>
