@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.QuizSettingsController"
+      spacing="10" alignment="CENTER" stylesheets="@styles.css">
+    <Label text="Quiz Settings" styleClass="title"/>
+    <GridPane hgap="10" vgap="10" alignment="CENTER">
+        <Label text="Number of Questions:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <TextField fx:id="numQuestionsField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <Label text="Time per Question (seconds):" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <TextField fx:id="timePerQuestionField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+        <CheckBox fx:id="timerEnabledCheckBox" text="Enable Timer" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"/>
+    </GridPane>
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Save Settings" onAction="#saveSettings"/>
+        <Button text="Back to Main Menu" onAction="#backToMain"/>
+    </HBox>
+    <Label fx:id="notificationLabel" styleClass="notification"/>
+</VBox>

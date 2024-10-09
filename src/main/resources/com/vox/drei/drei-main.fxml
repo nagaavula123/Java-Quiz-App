@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.DreiController"
+      spacing="20" alignment="CENTER" stylesheets="@styles.css">
+    <Label text="Quiz Game" styleClass="title"/>
+    <Button text="Start Quiz" onAction="#startQuiz" styleClass="menu-button"/>
+    <Button text="Quiz Settings" onAction="#openSettings" styleClass="menu-button"/>
+    <Button text="Manage Questions" onAction="#manageQuestions" styleClass="menu-button"/>
+    <Button text="Exit" onAction="#exitGame" styleClass="menu-button"/>
+</VBox>

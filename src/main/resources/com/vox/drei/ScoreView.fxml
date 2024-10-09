@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.ScoreController"
+      spacing="20" alignment="CENTER" stylesheets="@styles.css">
+    <Label text="Quiz Completed!" styleClass="title"/>
+    <Label fx:id="scoreLabel" styleClass="score-label"/>
+    <Button text="View Answers" onAction="#viewAnswers"/>
+    <Button text="Back to Main Menu" onAction="#backToMain"/>
+</VBox>
