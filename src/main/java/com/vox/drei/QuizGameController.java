@@ -9,8 +9,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.util.Collections;
@@ -22,6 +24,7 @@ public class QuizGameController {
     @FXML private Label questionLabel;
     @FXML private GridPane answerGrid;
     @FXML private Label timerLabel;
+    @FXML private VBox answerContainer;
 
     private static Quiz currentQuiz;
     private List<Question> questions;
@@ -37,23 +40,33 @@ public class QuizGameController {
 
     @FXML
     public void initialize() {
+        if (currentQuiz == null) {
+            // Handle error: No quiz selected
+            return;
+        }
         loadQuestions();
         displayQuestion();
         if (prefs.getBoolean("timerEnabled", true)) {
             startTimer();
+
         } else {
             timerLabel.setVisible(false);
         }
     }
 
     private void loadQuestions() {
-        questions = QuestionDatabase.getQuestionsForQuiz(currentQuiz.getId());
+        questions = currentQuiz.getQuestions();
         Collections.shuffle(questions);
         int numQuestions = Math.min(prefs.getInt("numQuestions", 5), questions.size());
         questions = questions.subList(0, numQuestions);
     }
 
     private void displayQuestion() {
+        if (currentQuestionIndex >= questions.size()) {
+            finishQuiz();
+            return;
+        }
+
         Question currentQuestion = questions.get(currentQuestionIndex);
 
         FadeTransition fadeOut = new FadeTransition(Duration.millis(500), questionLabel);
@@ -68,15 +81,25 @@ public class QuizGameController {
         });
         fadeOut.play();
 
-        answerGrid.getChildren().clear();
-        ToggleGroup group = new ToggleGroup();
+        answerContainer.getChildren().clear();
 
+        if (currentQuestion.getType().equals("MULTIPLE_CHOICE")) {
+            displayMultipleChoiceQuestion(currentQuestion);
+        } else if (currentQuestion.getType().equals("IDENTIFICATION")) {
+            displayIdentificationQuestion();
+        }
+
+        resetTimer();
+    }
+
+    private void displayMultipleChoiceQuestion(Question currentQuestion) {
+        ToggleGroup group = new ToggleGroup();
         List<String> answers = currentQuestion.getAnswers();
         for (int i = 0; i < answers.size(); i++) {
             RadioButton rb = new RadioButton(answers.get(i));
             rb.setToggleGroup(group);
             rb.setUserData(i);
-            answerGrid.add(rb, i % 2, i / 2);
+            answerContainer.getChildren().add(rb);
 
             FadeTransition ft = new FadeTransition(Duration.millis(500), rb);
             ft.setFromValue(0.0);
@@ -84,8 +107,17 @@ public class QuizGameController {
             ft.setDelay(Duration.millis(i * 100));
             ft.play();
         }
+    }
 
-        resetTimer();
+    private void displayIdentificationQuestion() {
+        TextField answerField = new TextField();
+        answerField.setPromptText("Enter your answer here");
+        answerContainer.getChildren().add(answerField);
+
+        FadeTransition ft = new FadeTransition(Duration.millis(500), answerField);
+        ft.setFromValue(0.0);
+        ft.setToValue(1.0);
+        ft.play();
     }
 
     private void startTimer() {
@@ -128,10 +160,20 @@ public class QuizGameController {
     }
 
     private void checkAnswer() {
-        ToggleGroup group = ((RadioButton) answerGrid.getChildren().get(0)).getToggleGroup();
-        if (group.getSelectedToggle() != null) {
-            int selectedAnswer = (int) group.getSelectedToggle().getUserData();
-            if (questions.get(currentQuestionIndex).isCorrectAnswer(selectedAnswer)) {
+        Question currentQuestion = questions.get(currentQuestionIndex);
+        if (currentQuestion.getType().equals("MULTIPLE_CHOICE")) {
+            ToggleGroup group = ((RadioButton) answerContainer.getChildren().get(0)).getToggleGroup();
+            if (group.getSelectedToggle() != null) {
+                int selectedAnswer = (int) group.getSelectedToggle().getUserData();
+                if (currentQuestion.isCorrectAnswer(selectedAnswer)) {
+                    score++;
+                }
+            }
+        } else if (currentQuestion.getType().equals("IDENTIFICATION")) {
+            TextField answerField = (TextField) answerContainer.getChildren().get(0);
+            String userAnswer = answerField.getText().trim().toLowerCase();
+            String correctAnswer = currentQuestion.getAnswers().get(currentQuestion.getCorrectAnswerIndex()).toLowerCase();
+            if (userAnswer.equals(correctAnswer)) {
                 score++;
             }
         }
@@ -155,5 +197,4 @@ public class QuizGameController {
             e.printStackTrace();
         }
     }
-
 }

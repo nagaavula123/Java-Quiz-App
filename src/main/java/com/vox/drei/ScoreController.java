@@ -1,9 +1,7 @@
 package com.vox.drei;
 
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -13,6 +11,11 @@ public class ScoreController {
 
     @FXML private Label quizNameLabel;
     @FXML private Label scoreLabel;
+    @FXML private TableView<Question> answersTable;
+    @FXML private TableColumn<Question, String> questionColumn;
+    @FXML private TableColumn<Question, String> userAnswerColumn;
+    @FXML private TableColumn<Question, String> correctAnswerColumn;
+
     private List<Question> questions;
     private String quizName;
 
@@ -22,6 +25,7 @@ public class ScoreController {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+        populateAnswersTable();
     }
 
     public void setQuizName(String quizName) {
@@ -29,30 +33,22 @@ public class ScoreController {
         quizNameLabel.setText("Quiz: " + quizName);
     }
 
-    @FXML
-    private void viewAnswers() {
-        Stage answerStage = new Stage();
-        VBox answerBox = new VBox(10);
-        answerBox.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+    private void populateAnswersTable() {
+        questionColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getQuestion()));
+        userAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(getUserAnswer(cellData.getValue())));
+        correctAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(getCorrectAnswer(cellData.getValue())));
 
-        for (Question question : questions) {
-            Label questionLabel = new Label(question.getQuestion());
-            questionLabel.getStyleClass().add("question-label");
+        answersTable.getItems().addAll(questions);
+    }
 
-            ListView<String> answerList = new ListView<>();
-            answerList.getItems().addAll(question.getAnswers());
-            answerList.getStyleClass().add("answer-list");
+    private String getUserAnswer(Question question) {
+        // This method should be implemented to return the user's answer for each question
+        // You'll need to store the user's answers during the quiz
+        return "User Answer"; // Placeholder
+    }
 
-            Label correctAnswerLabel = new Label("Correct Answer: " + question.getAnswers().get(question.getCorrectAnswerIndex()));
-            correctAnswerLabel.getStyleClass().add("correct-answer-label");
-
-            answerBox.getChildren().addAll(questionLabel, answerList, correctAnswerLabel);
-        }
-
-        Scene answerScene = new Scene(answerBox, 400, 600);
-        answerStage.setScene(answerScene);
-        answerStage.setTitle("Quiz Answers - " + quizName);
-        answerStage.show();
+    private String getCorrectAnswer(Question question) {
+        return question.getAnswers().get(question.getCorrectAnswerIndex());
     }
 
     @FXML

@@ -8,16 +8,18 @@ public class Question {
     private String question;
     private List<String> answers;
     private int correctAnswerIndex;
+    private String type; // "MULTIPLE_CHOICE" or "IDENTIFICATION"
 
     public Question() {
         this.id = UUID.randomUUID().toString();
     }
 
-    public Question(String question, List<String> answers, int correctAnswerIndex) {
+    public Question(String question, List<String> answers, int correctAnswerIndex, String type) {
         this();
         this.question = question;
         this.answers = answers;
         this.correctAnswerIndex = correctAnswerIndex;
+        this.type = type;
     }
 
     // Getters and setters
@@ -29,8 +31,14 @@ public class Question {
     public void setAnswers(List<String> answers) { this.answers = answers; }
     public int getCorrectAnswerIndex() { return correctAnswerIndex; }
     public void setCorrectAnswerIndex(int correctAnswerIndex) { this.correctAnswerIndex = correctAnswerIndex; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 
     public boolean isCorrectAnswer(int index) {
         return index == correctAnswerIndex;
+    }
+
+    public boolean isCorrectAnswer(String answer) {
+        return answer.equalsIgnoreCase(answers.get(correctAnswerIndex));
     }
 }

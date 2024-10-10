@@ -10,7 +10,13 @@
         <Insets top="40" right="40" bottom="40" left="40"/>
     </padding>
     <Label text="Select a Quiz" styleClass="title"/>
-    <ListView fx:id="quizListView" VBox.vgrow="ALWAYS"/>
+    <TableView fx:id="quizTableView" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="Quiz Name" prefWidth="200"/>
+            <TableColumn fx:id="categoryColumn" text="Category" prefWidth="150"/>
+            <TableColumn fx:id="questionCountColumn" text="Questions" prefWidth="100"/>
+        </columns>
+    </TableView>
     <HBox spacing="20" alignment="CENTER">
         <Button text="Start Selected Quiz" onAction="#startSelectedQuiz" styleClass="primary-button"/>
         <Button text="Back to Main Menu" onAction="#backToMain" styleClass="secondary-button"/>

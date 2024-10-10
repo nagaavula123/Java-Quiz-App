@@ -6,17 +6,19 @@ public class DreiController {
 
     @FXML
     private void startQuiz() throws Exception {
-        DreiMain.showView("QuizSelectionView.fxml");
+        DreiMain.showQuizSelectionView();
     }
 
     @FXML
     private void manageQuizzes() throws Exception {
-        DreiMain.showView("ManageQuizzesView.fxml");
+        DreiMain.showManageQuizzesView();
     }
 
     @FXML
     private void openSettings() throws Exception {
-        DreiMain.showView("QuizSettingsView.fxml");
+        // If you have a QuizSettingsView, you need to add a method for it in DreiMain
+        // For now, let's assume it doesn't exist and we'll just print a message
+        System.out.println("Settings view not implemented yet");
     }
 
     @FXML

@@ -12,6 +12,7 @@ module com.vox.drei {
     requires com.almasb.fxgl.all;
     requires java.prefs;
     requires com.fasterxml.jackson.databind;
+    requires java.sql;
 
     opens com.vox.drei to javafx.fxml;
     exports com.vox.drei;

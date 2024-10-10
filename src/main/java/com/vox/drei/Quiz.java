@@ -7,16 +7,18 @@ import java.util.UUID;
 public class Quiz {
     private String id;
     private String name;
-    private List<String> questionIds;
+    private String category;
+    private List<Question> questions;
 
     public Quiz() {
         this.id = UUID.randomUUID().toString();
-        this.questionIds = new ArrayList<>();
+        this.questions = new ArrayList<>();
     }
 
-    public Quiz(String name) {
+    public Quiz(String name, String category) {
         this();
         this.name = name;
+        this.category = category;
     }
 
     // Getters and setters
@@ -24,14 +26,16 @@ public class Quiz {
     public void setId(String id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public List<String> getQuestionIds() { return questionIds; }
-    public void setQuestionIds(List<String> questionIds) { this.questionIds = questionIds; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    public List<Question> getQuestions() { return questions; }
+    public void setQuestions(List<Question> questions) { this.questions = questions; }
 
-    public void addQuestionId(String questionId) {
-        this.questionIds.add(questionId);
+    public void addQuestion(Question question) {
+        this.questions.add(question);
     }
 
-    public void removeQuestionId(String questionId) {
-        this.questionIds.remove(questionId);
+    public void removeQuestion(Question question) {
+        this.questions.remove(question);
     }
 }

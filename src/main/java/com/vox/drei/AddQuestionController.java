@@ -1,8 +1,11 @@
 package com.vox.drei;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
+import javafx.stage.Stage;
+import javafx.collections.FXCollections;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,47 +13,40 @@ import java.util.List;
 public class AddQuestionController {
 
     @FXML private TextField questionField;
-    @FXML private TextField answer1Field;
-    @FXML private TextField answer2Field;
-    @FXML private TextField answer3Field;
-    @FXML private TextField answer4Field;
-    @FXML private ComboBox<String> correctAnswerComboBox;
+    @FXML private TextArea answersField;
+    @FXML private ComboBox<Integer> correctAnswerComboBox;
+    @FXML private ComboBox<String> questionTypeComboBox;
+
+    private Quiz currentQuiz;
 
     @FXML
     public void initialize() {
-        correctAnswerComboBox.getItems().addAll("Answer 1", "Answer 2", "Answer 3", "Answer 4");
+        correctAnswerComboBox.setItems(FXCollections.observableArrayList(0, 1, 2, 3));
+        questionTypeComboBox.setItems(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
+    }
+
+    public void setQuiz(Quiz quiz) {
+        this.currentQuiz = quiz;
     }
 
     @FXML
     private void addQuestion() {
-        String question = questionField.getText();
-        List<String> answers = Arrays.asList(
-                answer1Field.getText(),
-                answer2Field.getText(),
-                answer3Field.getText(),
-                answer4Field.getText()
-        );
-        int correctAnswerIndex = correctAnswerComboBox.getSelectionModel().getSelectedIndex();
+        String questionText = questionField.getText();
+        String answersText = answersField.getText();
+        List<String> answers = Arrays.asList(answersText.split("\n"));
+        int correctAnswerIndex = correctAnswerComboBox.getValue();
+        String questionType = questionTypeComboBox.getValue();
 
-        if (question.isEmpty() || answers.contains("") || correctAnswerIndex == -1) {
-            // Show error message
-            return;
-        }
+        Question newQuestion = new Question(questionText, answers, correctAnswerIndex, questionType);
+        QuestionDatabase.addQuestion(newQuestion, currentQuiz.getId());
 
-        Question newQuestion = new Question(question, answers, correctAnswerIndex);
-        QuestionDatabase.addQuestion(newQuestion);
-
-        // Clear fields after adding
-        questionField.clear();
-        answer1Field.clear();
-        answer2Field.clear();
-        answer3Field.clear();
-        answer4Field.clear();
-        correctAnswerComboBox.getSelectionModel().clearSelection();
+        Stage stage = (Stage) questionField.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
-    private void backToMain() throws Exception {
-        DreiMain.showMainView();
+    private void cancel() {
+        Stage stage = (Stage) questionField.getScene().getWindow();
+        stage.close();
     }
 }
