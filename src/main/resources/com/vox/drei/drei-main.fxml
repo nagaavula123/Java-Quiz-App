@@ -9,7 +9,7 @@
     <padding>
         <Insets top="40" right="40" bottom="40" left="40"/>
     </padding>
-    <Label text="Drei Quiz Game" styleClass="title"/>
+    <Label text="Quiz App" styleClass="title"/>
     <Button text="Start Quiz" onAction="#startQuiz" styleClass="menu-button"/>
     <Button text="Manage Quizzes" onAction="#manageQuizzes" styleClass="menu-button"/>
     <Button text="Quiz Settings" onAction="#openSettings" styleClass="menu-button"/>

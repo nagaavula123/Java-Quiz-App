@@ -6,7 +6,7 @@
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.QuizGameController"
       spacing="20" alignment="CENTER" stylesheets="@styles.css">
     <Label fx:id="questionLabel" styleClass="question-label"/>
-    <GridPane fx:id="answerGrid" alignment="CENTER" hgap="10" vgap="10"/>
+    <GridPane fx:id="answerGrid" alignment="CENTER" hgap="10" vgap="10" style="-fx-text-fill: black;"/>
     <Label fx:id="timerLabel" styleClass="timer-label"/>
     <Button text="Next Question" onAction="#nextQuestion"/>
 </VBox>

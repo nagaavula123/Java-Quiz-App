@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -272,8 +273,7 @@ public class ManageQuestionsController {
     }
 
     @FXML
-    private void backToManageQuizzes() {
-        Stage stage = (Stage) questionsTable.getScene().getWindow();
-        stage.close();
+    private void backToManageQuizzes() throws Exception {
+        DreiMain.showManageQuizzesView();
     }
 }

@@ -11,7 +11,8 @@ public class QuizSettingsController {
     @FXML private TextField numQuestionsField;
     @FXML private TextField timePerQuestionField;
     @FXML private CheckBox timerEnabledCheckBox;
-    @FXML private Label notificationLabel;
+    @FXML private Label notificationLabel;// Add this field
+    @FXML private CheckBox animationEnabledCheckBox;
 
     private Preferences prefs = Preferences.userNodeForPackage(QuizSettingsController.class);
 
@@ -20,6 +21,7 @@ public class QuizSettingsController {
         numQuestionsField.setText(String.valueOf(prefs.getInt("numQuestions", 5)));
         timePerQuestionField.setText(String.valueOf(prefs.getInt("timePerQuestion", 15)));
         timerEnabledCheckBox.setSelected(prefs.getBoolean("timerEnabled", true));
+        animationEnabledCheckBox.setSelected(prefs.getBoolean("animationEnabled", true));
     }
 
     @FXML
@@ -28,7 +30,9 @@ public class QuizSettingsController {
             int numQuestions = Integer.parseInt(numQuestionsField.getText());
             int timePerQuestion = Integer.parseInt(timePerQuestionField.getText());
             boolean timerEnabled = timerEnabledCheckBox.isSelected();
+            boolean animationEnabled = animationEnabledCheckBox.isSelected();
 
+            prefs.putBoolean("animationEnabled", animationEnabled);
             prefs.putInt("numQuestions", numQuestions);
             prefs.putInt("timePerQuestion", timePerQuestion);
             prefs.putBoolean("timerEnabled", timerEnabled);

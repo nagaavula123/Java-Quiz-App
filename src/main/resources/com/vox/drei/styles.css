@@ -1,69 +1,74 @@
 .root {
-    -fx-background-color: #f0f8ff;
+    -fx-background-color: #f0f8ff; /* Keeping the white background */
     -fx-font-family: 'Poppins', sans-serif;
 }
 
-*{
+* {
     -fx-font-family: Poppins;
 }
 
 .button {
-    -fx-background-color: #4CAF50;
-    -fx-text-fill: white;
+    -fx-background-color: rgba(26, 42, 108, 0.8); /* Dark navy blue */
+    -fx-text-fill: #ffffff; /* White text */
     -fx-font-size: 14px;
     -fx-padding: 10px 20px;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 1);
+    -fx-border-radius: 25px;
+    -fx-background-radius: 25px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 0);
     -fx-transition: all 0.3s ease;
 }
 
 .button:hover {
-    -fx-background-color: #45a049;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 1);
+    -fx-background-color: rgba(26, 42, 108, 1); /* Darker navy on hover */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 15, 0, 0, 0);
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
 
 .primary-button {
-    -fx-background-color: #2196F3;
+    -fx-background-color: #003366; /* Dark navy blue */
 }
 
 .primary-button:hover {
-    -fx-background-color: #1976D2;
+    -fx-background-color: #002244; /* Darker shade on hover */
 }
 
 .secondary-button {
-    -fx-background-color: #FFC107;
+    -fx-background-color: #FFB300; /* Yellowish for secondary buttons */
 }
 
 .secondary-button:hover {
-    -fx-background-color: #FFA000;
+    -fx-background-color: #FFA000; /* Darker shade on hover */
 }
 
 .label {
     -fx-font-size: 16px;
-    -fx-text-fill: #333333;
+    -fx-text-fill: #1a1a1a; /* Dark text color for better readability */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 0);
 }
 
 .text-field {
     -fx-font-size: 14px;
-    -fx-padding: 5px;
-    -fx-background-color: white;
-    -fx-border-color: #cccccc;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
+    -fx-padding: 8px;
+    -fx-background-color: rgba(26, 42, 108, 0.1); /* Light navy blue */
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-text-fill: #1a1a1a; /* Dark text color for better readability */
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.5);
+    -fx-border-radius: 25px;
+    -fx-background-radius: 25px;
 }
 
 .title {
     -fx-font-size: 36px;
     -fx-font-weight: bold;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 1);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 0);
+    -fx-text-fill: #003366; /* Dark navy blue for titles */
 }
 
 .subtitle {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
+    -fx-text-fill: #003366; /* Dark navy blue for subtitles */
 }
 
 .menu-button {
@@ -71,26 +76,22 @@
 }
 
 .table-view {
-    -fx-background-color: white;
-    -fx-border-color: #cccccc;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 0);
 }
 
 .table-view .column-header-background {
-    -fx-background-color: #2196F3;
+    -fx-background-color: rgba(26, 42, 108, 0.2); /* Light navy blue for column headers */
 }
 
 .table-view .column-header, .table-view .filler {
     -fx-size: 35;
     -fx-border-width: 0 0 1 0;
     -fx-background-color: transparent;
-    -fx-border-color:
-            transparent
-            transparent
-            derive(-fx-base, 80%)
-            transparent;
+    -fx-border-color: transparent transparent derive(-fx-base, 80%) transparent;
     -fx-border-insets: 0 10 1 0;
 }
 
@@ -98,8 +99,6 @@
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
-    -fx-alignment: center-left;
-    -fx-opacity: 1;
 }
 
 .table-view:focused .table-row-cell:filled:focused:selected {
@@ -107,82 +106,102 @@
 }
 
 .table-row-cell {
-    -fx-background-color: white;
-    -fx-border-color: transparent;
-    -fx-table-cell-border-color: transparent;
+    -fx-background-color: rgba(26, 42, 108, 0.05); /* Light navy blue for table rows */
+    -fx-text-fill: white;
 }
 
 .table-row-cell:odd {
-    -fx-background-color: #f8f8f8;
+    -fx-background-color: rgba(26, 42, 108, 0.1); /* Light navy blue for odd rows */
 }
 
 .table-row-cell:even {
-    -fx-background-color: white;
+    -fx-background-color: rgba(26, 42, 108, 0.2); /* Slightly darker for even rows */
 }
 
 .list-view {
-    -fx-background-color: white;
+    -fx-background-color: rgba(255, 255, 255, 0.1); /* Light navy background */
     -fx-border-color: #cccccc;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 5, 0, 0, 1);
 }
 
 .list-cell {
     -fx-background-color: transparent;
     -fx-padding: 10px;
-    -fx-text-fill: #333333;
+    -fx-text-fill: #1a1a1a; /* Dark text color for better readability */
 }
 
 .list-cell:odd {
-    -fx-background-color: #f8f8f8;
+    -fx-background-color: rgba(26, 42, 108, 0.1); /* Light navy for odd cells */
 }
 
 .list-cell:even {
-    -fx-background-color: white;
+    -fx-background-color: rgba(26, 42, 108, 0.2); /* Slightly darker for even cells */
 }
 
 .dialog-pane {
-    -fx-background-color: #f0f8ff;
+    -fx-background-color: #f0f8ff; /* Keeping the dialog pane background */
 }
 
 .dialog-pane .button {
-    -fx-background-color: #2196F3;
+    -fx-background-color: #2196F3; /* Keeping primary button color */
     -fx-text-fill: white;
 }
 
 .dialog-pane .button:hover {
-    -fx-background-color: #1976D2;
+    -fx-background-color: #1976D2; /* Keeping hover color for primary button */
+}
+
+.check-box {
+    -fx-text-fill: white;
 }
 
 .check-box .box {
-    -fx-background-color: white;
-    -fx-border-color: #cccccc;
-    -fx-border-radius: 3px;
-}
-
-.check-box:selected .mark {
-    -fx-background-color: #2196F3;
-}
-
-.combo-box {
-    -fx-background-color: white;
-    -fx-border-color: #cccccc;
+    -fx-background-color: rgba(26, 42, 108, 0.1); /* Light navy for checkbox */
+    -fx-border-color: rgba(255, 255, 255, 0.3);
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
 }
 
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.combo-box {
+    -fx-background-color: rgba(26, 42, 108, 0.1); /* Light navy for combo box */
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 25px;
+    -fx-background-radius: 25px;
+}
+
 .combo-box .list-cell {
-    -fx-text-fill: #333333;
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
 }
 
 .combo-box-popup .list-view {
-    -fx-background-color: white;
-    -fx-border-color: #cccccc;
+    -fx-background-color: rgba(26, 42, 108, 0.9);
+    -fx-border-color: rgba(255, 255, 255, 0.3);
 }
 
 .score-label {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: #4CAF50;
+    -fx-text-fill: #FFB300; /* Keeping the score label color */
+}
+
+.radio-button {
+    -fx-text-fill: white;
+}
+
+.radio-button .radio {
+    -fx-background-color: rgba(26, 42, 108, 0.1); /* Light navy for radio buttons */
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+}
+
+.radio-button:selected .radio .dot {
+    -fx-background-color: white;
 }

@@ -63,8 +63,8 @@ public class ScoreController {
         answersTable.setVisible(true);
 
         Stage stage = (Stage) rootVBox.getScene().getWindow();
-        double newHeight = 600; // Set a larger height to accommodate the table
-        double newWidth = 800;  // Set a larger width for better readability
+        double newHeight = 600;
+        double newWidth = 800;
 
         stage.setHeight(newHeight);
         stage.setWidth(newWidth);
