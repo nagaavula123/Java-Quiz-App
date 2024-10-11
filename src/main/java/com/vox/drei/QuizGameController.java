@@ -12,7 +12,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.util.Collections;
@@ -22,9 +21,8 @@ import java.util.prefs.Preferences;
 public class QuizGameController {
 
     @FXML private Label questionLabel;
-    @FXML private GridPane answerGrid;
+    @FXML private GridPane answerGrid; // Use GridPane for answers
     @FXML private Label timerLabel;
-    @FXML private VBox answerContainer;
 
     private static Quiz currentQuiz;
     private List<Question> questions;
@@ -48,7 +46,6 @@ public class QuizGameController {
         displayQuestion();
         if (prefs.getBoolean("timerEnabled", true)) {
             startTimer();
-
         } else {
             timerLabel.setVisible(false);
         }
@@ -81,7 +78,7 @@ public class QuizGameController {
         });
         fadeOut.play();
 
-        answerContainer.getChildren().clear();
+        answerGrid.getChildren().clear(); // Clear the grid before adding new answers
 
         if (currentQuestion.getType().equals("MULTIPLE_CHOICE")) {
             displayMultipleChoiceQuestion(currentQuestion);
@@ -99,7 +96,9 @@ public class QuizGameController {
             RadioButton rb = new RadioButton(answers.get(i));
             rb.setToggleGroup(group);
             rb.setUserData(i);
-            answerContainer.getChildren().add(rb);
+
+            // Add answers to the GridPane
+            answerGrid.add(rb, 0, i);
 
             FadeTransition ft = new FadeTransition(Duration.millis(500), rb);
             ft.setFromValue(0.0);
@@ -112,7 +111,9 @@ public class QuizGameController {
     private void displayIdentificationQuestion() {
         TextField answerField = new TextField();
         answerField.setPromptText("Enter your answer here");
-        answerContainer.getChildren().add(answerField);
+
+        // Add to GridPane
+        answerGrid.add(answerField, 0, 0);
 
         FadeTransition ft = new FadeTransition(Duration.millis(500), answerField);
         ft.setFromValue(0.0);
@@ -162,7 +163,7 @@ public class QuizGameController {
     private void checkAnswer() {
         Question currentQuestion = questions.get(currentQuestionIndex);
         if (currentQuestion.getType().equals("MULTIPLE_CHOICE")) {
-            ToggleGroup group = ((RadioButton) answerContainer.getChildren().get(0)).getToggleGroup();
+            ToggleGroup group = ((RadioButton) answerGrid.getChildren().get(0)).getToggleGroup();
             if (group.getSelectedToggle() != null) {
                 int selectedAnswer = (int) group.getSelectedToggle().getUserData();
                 if (currentQuestion.isCorrectAnswer(selectedAnswer)) {
@@ -170,7 +171,7 @@ public class QuizGameController {
                 }
             }
         } else if (currentQuestion.getType().equals("IDENTIFICATION")) {
-            TextField answerField = (TextField) answerContainer.getChildren().get(0);
+            TextField answerField = (TextField) answerGrid.getChildren().get(0);
             String userAnswer = answerField.getText().trim().toLowerCase();
             String correctAnswer = currentQuestion.getAnswers().get(currentQuestion.getCorrectAnswerIndex()).toLowerCase();
             if (userAnswer.equals(correctAnswer)) {

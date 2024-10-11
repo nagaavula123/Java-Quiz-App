@@ -5,24 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="55fc9eff-590e-4142-ae36-479987bf3475" name="Changes" comment="System Update/Improvement">
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/AddQuestionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/AddQuestionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/DreiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/DreiController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/DreiMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/DreiMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/ManageQuestionsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/ManageQuestionsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/ManageQuizzesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/ManageQuizzesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/Question.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/Question.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/QuestionDatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/QuestionDatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/Quiz.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/Quiz.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/QuizGameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/QuizGameController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/QuizSelectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/QuizSelectionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/ScoreController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/ScoreController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/vox/drei/ManageQuestionsView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/vox/drei/ManageQuestionsView.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/vox/drei/ManageQuizzesView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/vox/drei/ManageQuizzesView.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/vox/drei/QuizSelectionView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/vox/drei/QuizSelectionView.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,7 +107,8 @@
       <option name="presentableId" value="Default" />
       <updated>1728434961052</updated>
       <workItem from="1728434962037" duration="11637000" />
-      <workItem from="1728545500470" duration="3453000" />
+      <workItem from="1728545500470" duration="3777000" />
+      <workItem from="1728605491481" duration="3106000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Quiz System">
       <option name="closed" value="true" />
@@ -189,11 +174,30 @@
       <option name="project" value="LOCAL" />
       <updated>1728446966465</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="System Update/Improvement">
+      <option name="closed" value="true" />
+      <created>1728549235191</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1728549235191</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial Quiz System" />
