@@ -3,6 +3,8 @@ package com.vox.drei;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
 
@@ -19,6 +21,16 @@ public class QuizSelectionController {
     public void initialize() {
         loadQuizzes();
         setupTable();
+
+        quizTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // Set column widths
+        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
+        categoryColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
+        questionCountColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40); // 40% width
+
+        // Set grow priority
+        VBox.setVgrow(quizTableView, Priority.ALWAYS);
     }
 
     private void loadQuizzes() {
