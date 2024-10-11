@@ -130,27 +130,33 @@ public class ManageQuestionsController {
         ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
 
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+        ScrollPane scrollPane = new ScrollPane();
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(20, 150, 10, 10));
 
         TextField questionField = new TextField(question.getQuestion());
+        questionField.setPromptText("Question");
         ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
         typeComboBox.setValue(question.getType());
         VBox answersBox = new VBox(5);
 
-        grid.add(new Label("Question:"), 0, 0);
-        grid.add(questionField, 1, 0);
-        grid.add(new Label("Type:"), 0, 1);
-        grid.add(typeComboBox, 1, 1);
-        grid.add(new Label("Answers:"), 0, 2);
-        grid.add(answersBox, 1, 2);
+        content.getChildren().addAll(
+                new Label("Question:"),
+                questionField,
+                new Label("Type:"),
+                typeComboBox,
+                new Label("Answers:"),
+                answersBox
+        );
 
         typeComboBox.setOnAction(e -> updateAnswersBox(answersBox, typeComboBox.getValue(), question));
         updateAnswersBox(answersBox, question.getType(), question);
 
-        dialog.getDialogPane().setContent(grid);
+        scrollPane.setContent(content);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportHeight(400);
+
+        dialog.getDialogPane().setContent(scrollPane);
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
@@ -182,19 +188,6 @@ public class ManageQuestionsController {
         });
     }
 
-    private void deleteQuestion(Question question) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Delete Question");
-        alert.setHeaderText("Are you sure you want to delete this question?");
-        alert.setContentText("This action cannot be undone.");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            QuestionDatabase.deleteQuestion(question.getId());
-            loadQuestions();
-        }
-    }
-
     private void updateAnswersBox(VBox answersBox, String type, Question question) {
         answersBox.getChildren().clear();
         if (type.equals("MULTIPLE_CHOICE")) {
@@ -207,6 +200,7 @@ public class ManageQuestionsController {
                 answersBox.getChildren().add(answerField);
             }
             ComboBox<Integer> correctAnswerComboBox = new ComboBox<>(FXCollections.observableArrayList(0, 1, 2, 3));
+            correctAnswerComboBox.setPromptText("Correct Answer");
             if (question != null) {
                 correctAnswerComboBox.setValue(question.getCorrectAnswerIndex());
             }
@@ -218,6 +212,19 @@ public class ManageQuestionsController {
                 answerField.setText(question.getAnswers().get(0));
             }
             answersBox.getChildren().add(answerField);
+        }
+    }
+
+    private void deleteQuestion(Question question) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Question");
+        alert.setHeaderText("Are you sure you want to delete this question?");
+        alert.setContentText("This action cannot be undone.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            QuestionDatabase.deleteQuestion(question.getId());
+            loadQuestions();
         }
     }
 

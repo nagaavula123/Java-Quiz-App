@@ -5,7 +5,6 @@ import javafx.scene.control.*;
 import java.util.List;
 
 public class ScoreController {
-
     @FXML private Label quizNameLabel;
     @FXML private Label scoreLabel;
     @FXML private TableView<Question> answersTable;
@@ -22,7 +21,7 @@ public class ScoreController {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
-        populateAnswersTable(); // Call to populate the table with questions
+        populateAnswersTable();
     }
 
     public void setQuizName(String quizName) {
@@ -32,11 +31,19 @@ public class ScoreController {
 
     private void populateAnswersTable() {
         questionColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getQuestion()));
-        userAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getUserAnswer())); // Actual user answer here
+        userAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(getUserAnswerDisplay(cellData.getValue())));
         correctAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(getCorrectAnswer(cellData.getValue())));
 
-        // Populate the table with the question data
-        answersTable.getItems().setAll(questions); // Use setAll to refresh table contents
+        answersTable.getItems().setAll(questions);
+    }
+
+    private String getUserAnswerDisplay(Question question) {
+        if (question.getType().equals("MULTIPLE_CHOICE")) {
+            int userAnswerIndex = Integer.parseInt(question.getUserAnswer());
+            return question.getAnswers().get(userAnswerIndex);
+        } else {
+            return question.getUserAnswer();
+        }
     }
 
     private String getCorrectAnswer(Question question) {
@@ -50,7 +57,6 @@ public class ScoreController {
 
     @FXML
     private void viewAnswers() {
-        answersTable.setVisible(true);  // Make the answers table visible when the button is pressed
+        answersTable.setVisible(true);
     }
-
 }

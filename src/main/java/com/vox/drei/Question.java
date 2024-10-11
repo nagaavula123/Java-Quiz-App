@@ -40,6 +40,10 @@ public class Question {
         return userAnswer;
     }
 
+    public void setUserAnswer(String userAnswer) {
+        this.userAnswer = userAnswer;
+    }
+
     public boolean isCorrectAnswer(int index) {
         return index == correctAnswerIndex;
     }

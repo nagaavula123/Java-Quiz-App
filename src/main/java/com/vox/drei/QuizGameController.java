@@ -166,19 +166,22 @@ public class QuizGameController {
             ToggleGroup group = ((RadioButton) answerGrid.getChildren().get(0)).getToggleGroup();
             if (group.getSelectedToggle() != null) {
                 int selectedAnswer = (int) group.getSelectedToggle().getUserData();
+                currentQuestion.setUserAnswer(String.valueOf(selectedAnswer));
                 if (currentQuestion.isCorrectAnswer(selectedAnswer)) {
                     score++;
                 }
             }
         } else if (currentQuestion.getType().equals("IDENTIFICATION")) {
             TextField answerField = (TextField) answerGrid.getChildren().get(0);
-            String userAnswer = answerField.getText().trim().toLowerCase();
-            String correctAnswer = currentQuestion.getAnswers().get(currentQuestion.getCorrectAnswerIndex()).toLowerCase();
-            if (userAnswer.equals(correctAnswer)) {
+            String userAnswer = answerField.getText().trim();
+            currentQuestion.setUserAnswer(userAnswer);
+            String correctAnswer = currentQuestion.getAnswers().get(currentQuestion.getCorrectAnswerIndex());
+            if (userAnswer.equalsIgnoreCase(correctAnswer)) {
                 score++;
             }
         }
     }
+
 
     private void finishQuiz() {
         if (timer != null) {
