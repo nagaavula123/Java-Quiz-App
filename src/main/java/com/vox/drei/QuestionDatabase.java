@@ -24,26 +24,6 @@ public class QuestionDatabase {
         }
     }
 
-    public static List<Question> loadQuestions() {
-        List<Question> questions = new ArrayList<>();
-        String sql = "SELECT * FROM questions";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                Question question = new Question();
-                question.setId(rs.getString("id"));
-                question.setQuestion(rs.getString("question"));
-                question.setType(rs.getString("type"));
-                question.setAnswers(getAnswersForQuestion(question.getId()));
-                question.setCorrectAnswerIndex(getCorrectAnswerIndex(question.getId()));
-                questions.add(question);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return questions;
-    }
 
     public static void addQuiz(Quiz quiz) {
         String sql = "INSERT INTO quizzes(id, name, category) VALUES(?,?,?)";

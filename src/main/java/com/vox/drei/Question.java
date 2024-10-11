@@ -9,6 +9,7 @@ public class Question {
     private List<String> answers;
     private int correctAnswerIndex;
     private String type; // "MULTIPLE_CHOICE" or "IDENTIFICATION"
+    private String userAnswer; // New field to store user's answer
 
     public Question() {
         this.id = UUID.randomUUID().toString();
@@ -20,6 +21,7 @@ public class Question {
         this.answers = answers;
         this.correctAnswerIndex = correctAnswerIndex;
         this.type = type;
+        this.userAnswer = ""; // Initialize with an empty answer
     }
 
     // Getters and setters
@@ -34,11 +36,11 @@ public class Question {
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
 
-    public boolean isCorrectAnswer(int index) {
-        return index == correctAnswerIndex;
+    public String getUserAnswer() {
+        return userAnswer;
     }
 
-    public boolean isCorrectAnswer(String answer) {
-        return answer.equalsIgnoreCase(answers.get(correctAnswerIndex));
+    public boolean isCorrectAnswer(int index) {
+        return index == correctAnswerIndex;
     }
 }

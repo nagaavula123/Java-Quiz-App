@@ -2,9 +2,6 @@ package com.vox.drei;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
 import java.util.List;
 
 public class ScoreController {
@@ -25,7 +22,7 @@ public class ScoreController {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
-        populateAnswersTable();
+        populateAnswersTable(); // Call to populate the table with questions
     }
 
     public void setQuizName(String quizName) {
@@ -35,16 +32,11 @@ public class ScoreController {
 
     private void populateAnswersTable() {
         questionColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getQuestion()));
-        userAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(getUserAnswer(cellData.getValue())));
+        userAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getUserAnswer())); // Actual user answer here
         correctAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(getCorrectAnswer(cellData.getValue())));
 
-        answersTable.getItems().addAll(questions);
-    }
-
-    private String getUserAnswer(Question question) {
-        // This method should be implemented to return the user's answer for each question
-        // You'll need to store the user's answers during the quiz
-        return "User Answer"; // Placeholder
+        // Populate the table with the question data
+        answersTable.getItems().setAll(questions); // Use setAll to refresh table contents
     }
 
     private String getCorrectAnswer(Question question) {
@@ -58,9 +50,7 @@ public class ScoreController {
 
     @FXML
     private void viewAnswers() {
-        // Logic for viewing answers goes here
-        // You can show the TableView (answersTable) or any other UI element with the answers
-        answersTable.setVisible(true);  // If hidden by default, make it visible here
+        answersTable.setVisible(true);  // Make the answers table visible when the button is pressed
     }
 
 }

@@ -43,10 +43,4 @@ public class AddQuestionController {
         Stage stage = (Stage) questionField.getScene().getWindow();
         stage.close();
     }
-
-    @FXML
-    private void cancel() {
-        Stage stage = (Stage) questionField.getScene().getWindow();
-        stage.close();
-    }
 }

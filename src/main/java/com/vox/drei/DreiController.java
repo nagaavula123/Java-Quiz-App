@@ -16,9 +16,7 @@ public class DreiController {
 
     @FXML
     private void openSettings() throws Exception {
-        // If you have a QuizSettingsView, you need to add a method for it in DreiMain
-        // For now, let's assume it doesn't exist and we'll just print a message
-        System.out.println("Settings view not implemented yet");
+        DreiMain.showQuizSettingsView();
     }
 
     @FXML
