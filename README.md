@@ -1,5 +1,7 @@
 # 🎮 JavaFX Quiz App
 
+![JavaFX Quiz App](https://raw.githubusercontent.com/VoxDroid/Java-Quiz-App/refs/heads/main/src/main/resources/icon.png)
+
 ![Java Version](https://img.shields.io/badge/Java-17-orange)
 ![JavaFX](https://img.shields.io/badge/JavaFX-11%2B-blue)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
