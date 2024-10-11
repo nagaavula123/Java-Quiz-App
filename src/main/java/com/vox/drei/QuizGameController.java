@@ -7,10 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
 
@@ -149,6 +146,11 @@ public class QuizGameController {
 
     @FXML
     private void nextQuestion() {
+        if (!isAnswerSelected()) {
+            showAlert("No Answer Selected", "Please set an answer before moving to the next question.");
+            return;
+        }
+
         checkAnswer();
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.size()) {
@@ -156,6 +158,26 @@ public class QuizGameController {
         } else {
             finishQuiz();
         }
+    }
+
+    private boolean isAnswerSelected() {
+        Question currentQuestion = questions.get(currentQuestionIndex);
+        if (currentQuestion.getType().equals("MULTIPLE_CHOICE")) {
+            ToggleGroup group = ((RadioButton) answerGrid.getChildren().get(0)).getToggleGroup();
+            return group.getSelectedToggle() != null;
+        } else if (currentQuestion.getType().equals("IDENTIFICATION")) {
+            TextField answerField = (TextField) answerGrid.getChildren().get(0);
+            return !answerField.getText().trim().isEmpty();
+        }
+        return false;
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void checkAnswer() {

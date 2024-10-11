@@ -2,8 +2,9 @@ package com.vox.drei;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ScoreController {
         userAnswerColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
         correctAnswerColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
 
-        VBox.setVgrow(answersTable, Priority.ALWAYS);
+        answersTable.setVisible(false);
     }
 
     public void setScore(int score, int totalQuestions) {
@@ -60,5 +61,15 @@ public class ScoreController {
     @FXML
     private void viewAnswers() {
         answersTable.setVisible(true);
+
+        Stage stage = (Stage) rootVBox.getScene().getWindow();
+        double newHeight = 600; // Set a larger height to accommodate the table
+        double newWidth = 800;  // Set a larger width for better readability
+
+        stage.setHeight(newHeight);
+        stage.setWidth(newWidth);
+
+        // Center the stage on the screen
+        stage.centerOnScreen();
     }
 }

@@ -4,10 +4,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.ScoreController"
+<VBox fx:id="rootVBox" xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.ScoreController"
       spacing="20" alignment="CENTER" stylesheets="@styles.css">
     <padding>
-        <Insets top="40" right="40" bottom="40" left="40"/>
+        <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
     <Label text="Quiz Completed!" styleClass="title"/>
     <Label fx:id="quizNameLabel" styleClass="subtitle"/>
@@ -15,8 +15,7 @@
     <Button text="View Answers" onAction="#viewAnswers"/>
     <Button text="Back to Main Menu" onAction="#backToMain"/>
 
-    <!-- TableView for displaying the answers -->
-    <TableView fx:id="answersTable" visible="false">
+    <TableView fx:id="answersTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="questionColumn" text="Question"/>
             <TableColumn fx:id="userAnswerColumn" text="Your Answer"/>
