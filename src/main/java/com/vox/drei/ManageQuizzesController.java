@@ -6,12 +6,14 @@ import javafx.scene.layout.HBox;
 import javafx.collections.FXCollections;
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
 import java.util.Optional;
 
 public class ManageQuizzesController {
-
+    @FXML private VBox rootVBox;
     @FXML private TableView<Quiz> quizzesTable;
     @FXML private TableColumn<Quiz, String> nameColumn;
     @FXML private TableColumn<Quiz, String> categoryColumn;
@@ -23,6 +25,17 @@ public class ManageQuizzesController {
     public void initialize() {
         loadQuizzes();
         setupTable();
+
+        // Set column resize policy
+        quizzesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // Set column widths
+        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
+        categoryColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
+        actionsColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40); // 40% width
+
+        // Set grow priority
+        VBox.setVgrow(quizzesTable, Priority.ALWAYS);
     }
 
     private void loadQuizzes() {

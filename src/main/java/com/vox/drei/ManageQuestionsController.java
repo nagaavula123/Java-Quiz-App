@@ -1,19 +1,23 @@
 package com.vox.drei;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ManageQuestionsController {
-
+    @FXML private VBox rootVBox;
     @FXML private TableView<Question> questionsTable;
     @FXML private TableColumn<Question, String> questionColumn;
     @FXML private TableColumn<Question, String> typeColumn;
@@ -35,6 +39,17 @@ public class ManageQuestionsController {
     @FXML
     public void initialize() {
         setupTable();
+
+        // Set column resize policy
+        questionsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // Set column widths
+        questionColumn.setMaxWidth(1f * Integer.MAX_VALUE * 50); // 50% width
+        typeColumn.setMaxWidth(1f * Integer.MAX_VALUE * 20); // 20% width
+        actionsColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
+
+        // Set grow priority
+        VBox.setVgrow(questionsTable, Priority.ALWAYS);
     }
 
     private void setupTable() {
@@ -44,10 +59,12 @@ public class ManageQuestionsController {
         actionsColumn.setCellFactory(param -> new TableCell<>() {
             private final Button editButton = new Button("Edit");
             private final Button deleteButton = new Button("Delete");
+            private final HBox buttonsBox = new HBox(5, editButton, deleteButton);
 
             {
                 editButton.setOnAction(event -> editQuestion(getTableView().getItems().get(getIndex())));
                 deleteButton.setOnAction(event -> deleteQuestion(getTableView().getItems().get(getIndex())));
+                buttonsBox.setPadding(new Insets(2));
             }
 
             @Override
@@ -56,11 +73,12 @@ public class ManageQuestionsController {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    setGraphic(new VBox(5, editButton, deleteButton));
+                    setGraphic(buttonsBox);
                 }
             }
         });
     }
+
 
     @FXML
     private void addNewQuestion() {
@@ -71,32 +89,54 @@ public class ManageQuestionsController {
         ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
 
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+        // Create a ScrollPane to ensure all content is accessible
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportHeight(400);
+
+        // Create a VBox to hold all the form elements
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(20, 20, 10, 20));
 
         TextField questionField = new TextField();
+        questionField.setPromptText("Enter your question");
+
         ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
+        typeComboBox.setPromptText("Select question type");
+
         VBox answersBox = new VBox(5);
+        Label answersLabel = new Label("Answers:");
 
-        grid.add(new Label("Question:"), 0, 0);
-        grid.add(questionField, 1, 0);
-        grid.add(new Label("Type:"), 0, 1);
-        grid.add(typeComboBox, 1, 1);
-        grid.add(new Label("Answers:"), 0, 2);
-        grid.add(answersBox, 1, 2);
+        content.getChildren().addAll(
+                new Label("Question:"),
+                questionField,
+                new Label("Type:"),
+                typeComboBox,
+                answersLabel,
+                answersBox
+        );
 
+        // Update the answers box based on the selected question type
         typeComboBox.setOnAction(e -> updateAnswersBox(answersBox, typeComboBox.getValue(), null));
 
-        dialog.getDialogPane().setContent(grid);
+        scrollPane.setContent(content);
+        dialog.getDialogPane().setContent(scrollPane);
+
+        // Enable/Disable save button depending on whether a question is entered.
+        Node saveButton = dialog.getDialogPane().lookupButton(saveButtonType);
+        saveButton.setDisable(true);
+
+        // Do some validation (using an anonymous inner-class for brevity)
+        questionField.textProperty().addListener((observable, oldValue, newValue) -> {
+            saveButton.setDisable(newValue.trim().isEmpty());
+        });
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
                 String questionText = questionField.getText();
                 String type = typeComboBox.getValue();
-                List<String> answers;
-                int correctAnswerIndex;
+                List<String> answers = new ArrayList<>();
+                int correctAnswerIndex = 0;
 
                 if (type.equals("MULTIPLE_CHOICE")) {
                     answers = answersBox.getChildren().stream()
@@ -106,8 +146,7 @@ public class ManageQuestionsController {
                     ComboBox<Integer> correctAnswerComboBox = (ComboBox<Integer>) answersBox.getChildren().get(4);
                     correctAnswerIndex = correctAnswerComboBox.getValue();
                 } else {
-                    answers = List.of(((TextField) answersBox.getChildren().get(0)).getText());
-                    correctAnswerIndex = 0;
+                    answers.add(((TextField) answersBox.getChildren().get(0)).getText());
                 }
 
                 return new Question(questionText, answers, correctAnswerIndex, type);
@@ -200,7 +239,7 @@ public class ManageQuestionsController {
                 answersBox.getChildren().add(answerField);
             }
             ComboBox<Integer> correctAnswerComboBox = new ComboBox<>(FXCollections.observableArrayList(0, 1, 2, 3));
-            correctAnswerComboBox.setPromptText("Correct Answer");
+            correctAnswerComboBox.setPromptText("Select correct answer");
             if (question != null) {
                 correctAnswerComboBox.setValue(question.getCorrectAnswerIndex());
             }
