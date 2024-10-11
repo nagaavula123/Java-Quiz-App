@@ -7,21 +7,21 @@ public class Question {
     private String id;
     private String question;
     private List<String> answers;
-    private int correctAnswerIndex;
-    private String type; // "MULTIPLE_CHOICE" or "IDENTIFICATION"
-    private String userAnswer; // New field to store user's answer
+    private String correctAnswer;
+    private String type;
+    private String userAnswer;
 
     public Question() {
         this.id = UUID.randomUUID().toString();
     }
 
-    public Question(String question, List<String> answers, int correctAnswerIndex, String type) {
+    public Question(String question, List<String> answers, String correctAnswer, String type) {
         this();
         this.question = question;
         this.answers = answers;
-        this.correctAnswerIndex = correctAnswerIndex;
+        this.correctAnswer = correctAnswer;
         this.type = type;
-        this.userAnswer = ""; // Initialize with an empty answer
+        this.userAnswer = "";
     }
 
     // Getters and setters
@@ -31,20 +31,18 @@ public class Question {
     public void setQuestion(String question) { this.question = question; }
     public List<String> getAnswers() { return answers; }
     public void setAnswers(List<String> answers) { this.answers = answers; }
-    public int getCorrectAnswerIndex() { return correctAnswerIndex; }
-    public void setCorrectAnswerIndex(int correctAnswerIndex) { this.correctAnswerIndex = correctAnswerIndex; }
+    public String getCorrectAnswer() { return correctAnswer; }
+    public void setCorrectAnswer(String correctAnswer) { this.correctAnswer = correctAnswer; }
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
+    public String getUserAnswer() { return userAnswer; }
+    public void setUserAnswer(String userAnswer) { this.userAnswer = userAnswer; }
 
-    public String getUserAnswer() {
-        return userAnswer;
+    public boolean isCorrectAnswer(String answer) {
+        return answer.equals(correctAnswer);
     }
 
-    public void setUserAnswer(String userAnswer) {
-        this.userAnswer = userAnswer;
-    }
-
-    public boolean isCorrectAnswer(int index) {
-        return index == correctAnswerIndex;
+    public int getCorrectAnswerIndex() {
+        return answers.indexOf(correctAnswer);
     }
 }

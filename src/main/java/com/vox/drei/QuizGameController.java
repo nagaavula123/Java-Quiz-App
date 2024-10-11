@@ -21,7 +21,7 @@ import java.util.prefs.Preferences;
 public class QuizGameController {
 
     @FXML private Label questionLabel;
-    @FXML private GridPane answerGrid; // Use GridPane for answers
+    @FXML private GridPane answerGrid;
     @FXML private Label timerLabel;
 
     private static Quiz currentQuiz;
@@ -78,7 +78,7 @@ public class QuizGameController {
         });
         fadeOut.play();
 
-        answerGrid.getChildren().clear(); // Clear the grid before adding new answers
+        answerGrid.getChildren().clear();
 
         if (currentQuestion.getType().equals("MULTIPLE_CHOICE")) {
             displayMultipleChoiceQuestion(currentQuestion);
@@ -95,9 +95,8 @@ public class QuizGameController {
         for (int i = 0; i < answers.size(); i++) {
             RadioButton rb = new RadioButton(answers.get(i));
             rb.setToggleGroup(group);
-            rb.setUserData(i);
+            rb.setUserData(answers.get(i));
 
-            // Add answers to the GridPane
             answerGrid.add(rb, 0, i);
 
             FadeTransition ft = new FadeTransition(Duration.millis(500), rb);
@@ -112,7 +111,6 @@ public class QuizGameController {
         TextField answerField = new TextField();
         answerField.setPromptText("Enter your answer here");
 
-        // Add to GridPane
         answerGrid.add(answerField, 0, 0);
 
         FadeTransition ft = new FadeTransition(Duration.millis(500), answerField);
@@ -165,8 +163,8 @@ public class QuizGameController {
         if (currentQuestion.getType().equals("MULTIPLE_CHOICE")) {
             ToggleGroup group = ((RadioButton) answerGrid.getChildren().get(0)).getToggleGroup();
             if (group.getSelectedToggle() != null) {
-                int selectedAnswer = (int) group.getSelectedToggle().getUserData();
-                currentQuestion.setUserAnswer(String.valueOf(selectedAnswer));
+                String selectedAnswer = (String) group.getSelectedToggle().getUserData();
+                currentQuestion.setUserAnswer(selectedAnswer);
                 if (currentQuestion.isCorrectAnswer(selectedAnswer)) {
                     score++;
                 }
@@ -175,13 +173,11 @@ public class QuizGameController {
             TextField answerField = (TextField) answerGrid.getChildren().get(0);
             String userAnswer = answerField.getText().trim();
             currentQuestion.setUserAnswer(userAnswer);
-            String correctAnswer = currentQuestion.getAnswers().get(currentQuestion.getCorrectAnswerIndex());
-            if (userAnswer.equalsIgnoreCase(correctAnswer)) {
+            if (currentQuestion.isCorrectAnswer(userAnswer)) {
                 score++;
             }
         }
     }
-
 
     private void finishQuiz() {
         if (timer != null) {

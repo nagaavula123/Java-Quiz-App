@@ -35,7 +35,7 @@ public class DreiMain extends Application {
         FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("ManageQuizzesView.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("Manage Quizzes");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root, 900, 600));
     }
 
     public static void showManageQuestionsView(Quiz quiz) throws Exception {

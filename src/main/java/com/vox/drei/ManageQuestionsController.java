@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ManageQuestionsController {
     @FXML private VBox rootVBox;
@@ -40,15 +41,12 @@ public class ManageQuestionsController {
     public void initialize() {
         setupTable();
 
-        // Set column resize policy
         questionsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Set column widths
-        questionColumn.setMaxWidth(1f * Integer.MAX_VALUE * 50); // 50% width
-        typeColumn.setMaxWidth(1f * Integer.MAX_VALUE * 20); // 20% width
-        actionsColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
+        questionColumn.setMaxWidth(1f * Integer.MAX_VALUE * 50);
+        typeColumn.setMaxWidth(1f * Integer.MAX_VALUE * 20);
+        actionsColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
 
-        // Set grow priority
         VBox.setVgrow(questionsTable, Priority.ALWAYS);
     }
 
@@ -76,88 +74,6 @@ public class ManageQuestionsController {
                     setGraphic(buttonsBox);
                 }
             }
-        });
-    }
-
-
-    @FXML
-    private void addNewQuestion() {
-        Dialog<Question> dialog = new Dialog<>();
-        dialog.setTitle("Add New Question");
-        dialog.setHeaderText("Enter the new question details");
-
-        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
-
-        // Create a ScrollPane to ensure all content is accessible
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setFitToWidth(true);
-        scrollPane.setPrefViewportHeight(400);
-
-        // Create a VBox to hold all the form elements
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(20, 20, 10, 20));
-
-        TextField questionField = new TextField();
-        questionField.setPromptText("Enter your question");
-
-        ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
-        typeComboBox.setPromptText("Select question type");
-
-        VBox answersBox = new VBox(5);
-        Label answersLabel = new Label("Answers:");
-
-        content.getChildren().addAll(
-                new Label("Question:"),
-                questionField,
-                new Label("Type:"),
-                typeComboBox,
-                answersLabel,
-                answersBox
-        );
-
-        // Update the answers box based on the selected question type
-        typeComboBox.setOnAction(e -> updateAnswersBox(answersBox, typeComboBox.getValue(), null));
-
-        scrollPane.setContent(content);
-        dialog.getDialogPane().setContent(scrollPane);
-
-        // Enable/Disable save button depending on whether a question is entered.
-        Node saveButton = dialog.getDialogPane().lookupButton(saveButtonType);
-        saveButton.setDisable(true);
-
-        // Do some validation (using an anonymous inner-class for brevity)
-        questionField.textProperty().addListener((observable, oldValue, newValue) -> {
-            saveButton.setDisable(newValue.trim().isEmpty());
-        });
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == saveButtonType) {
-                String questionText = questionField.getText();
-                String type = typeComboBox.getValue();
-                List<String> answers = new ArrayList<>();
-                int correctAnswerIndex = 0;
-
-                if (type.equals("MULTIPLE_CHOICE")) {
-                    answers = answersBox.getChildren().stream()
-                            .filter(node -> node instanceof TextField)
-                            .map(node -> ((TextField) node).getText())
-                            .collect(Collectors.toList());
-                    ComboBox<Integer> correctAnswerComboBox = (ComboBox<Integer>) answersBox.getChildren().get(4);
-                    correctAnswerIndex = correctAnswerComboBox.getValue();
-                } else {
-                    answers.add(((TextField) answersBox.getChildren().get(0)).getText());
-                }
-
-                return new Question(questionText, answers, correctAnswerIndex, type);
-            }
-            return null;
-        });
-
-        Optional<Question> result = dialog.showAndWait();
-        result.ifPresent(question -> {
-            QuestionDatabase.addQuestion(question, currentQuiz.getId());
-            loadQuestions();
         });
     }
 
@@ -208,11 +124,14 @@ public class ManageQuestionsController {
                             .map(node -> ((TextField) node).getText())
                             .collect(Collectors.toList());
                     question.setAnswers(answers);
-                    ComboBox<Integer> correctAnswerComboBox = (ComboBox<Integer>) answersBox.getChildren().get(4);
-                    question.setCorrectAnswerIndex(correctAnswerComboBox.getValue());
+                    ComboBox<String> correctAnswerComboBox = (ComboBox<String>) answersBox.getChildren().get(4);
+                    String selectedAnswer = correctAnswerComboBox.getValue();
+                    int correctAnswerIndex = Integer.parseInt(selectedAnswer.split(" ")[1]) - 1;
+                    question.setCorrectAnswer(answers.get(correctAnswerIndex));
                 } else {
-                    question.setAnswers(List.of(((TextField) answersBox.getChildren().get(0)).getText()));
-                    question.setCorrectAnswerIndex(0);
+                    String correctAnswer = ((TextField) answersBox.getChildren().get(0)).getText();
+                    question.setAnswers(List.of(correctAnswer));
+                    question.setCorrectAnswer(correctAnswer);
                 }
 
                 return question;
@@ -238,20 +157,105 @@ public class ManageQuestionsController {
                 }
                 answersBox.getChildren().add(answerField);
             }
-            ComboBox<Integer> correctAnswerComboBox = new ComboBox<>(FXCollections.observableArrayList(0, 1, 2, 3));
+            ComboBox<String> correctAnswerComboBox = new ComboBox<>();
             correctAnswerComboBox.setPromptText("Select correct answer");
+            correctAnswerComboBox.setItems(FXCollections.observableArrayList(
+                    IntStream.rangeClosed(1, 4)
+                            .mapToObj(i -> "Answer " + i)
+                            .collect(Collectors.toList())
+            ));
             if (question != null) {
-                correctAnswerComboBox.setValue(question.getCorrectAnswerIndex());
+                int correctAnswerIndex = question.getAnswers().indexOf(question.getCorrectAnswer()) + 1;
+                correctAnswerComboBox.setValue("Answer " + correctAnswerIndex);
             }
             answersBox.getChildren().add(correctAnswerComboBox);
         } else {
             TextField answerField = new TextField();
             answerField.setPromptText("Correct Answer");
             if (question != null && !question.getAnswers().isEmpty()) {
-                answerField.setText(question.getAnswers().get(0));
+                answerField.setText(question.getCorrectAnswer());
             }
             answersBox.getChildren().add(answerField);
         }
+    }
+
+    @FXML
+    private void addNewQuestion() {
+        Dialog<Question> dialog = new Dialog<>();
+        dialog.setTitle("Add New Question");
+        dialog.setHeaderText("Enter the new question details");
+
+        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportHeight(400);
+
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(20, 20, 10, 20));
+
+        TextField questionField = new TextField();
+        questionField.setPromptText("Enter your question");
+
+        ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
+        typeComboBox.setPromptText("Select question type");
+
+        VBox answersBox = new VBox(5);
+        Label answersLabel = new Label("Answers:");
+
+        content.getChildren().addAll(
+                new Label("Question:"),
+                questionField,
+                new Label("Type:"),
+                typeComboBox,
+                answersLabel,
+                answersBox
+        );
+
+        typeComboBox.setOnAction(e -> updateAnswersBox(answersBox, typeComboBox.getValue(), null));
+
+        scrollPane.setContent(content);
+        dialog.getDialogPane().setContent(scrollPane);
+
+        Node saveButton = dialog.getDialogPane().lookupButton(saveButtonType);
+        saveButton.setDisable(true);
+
+        questionField.textProperty().addListener((observable, oldValue, newValue) -> {
+            saveButton.setDisable(newValue.trim().isEmpty());
+        });
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                String questionText = questionField.getText();
+                String type = typeComboBox.getValue();
+                List<String> answers = new ArrayList<>();
+                String correctAnswer = "";
+
+                if (type.equals("MULTIPLE_CHOICE")) {
+                    answers = answersBox.getChildren().stream()
+                            .filter(node -> node instanceof TextField)
+                            .map(node -> ((TextField) node).getText())
+                            .collect(Collectors.toList());
+                    ComboBox<String> correctAnswerComboBox = (ComboBox<String>) answersBox.getChildren().get(4);
+                    String selectedAnswer = correctAnswerComboBox.getValue();
+                    int correctAnswerIndex = Integer.parseInt(selectedAnswer.split(" ")[1]) - 1;
+                    correctAnswer = answers.get(correctAnswerIndex);
+                } else {
+                    correctAnswer = ((TextField) answersBox.getChildren().get(0)).getText();
+                    answers.add(correctAnswer);
+                }
+
+                return new Question(questionText, answers, correctAnswer, type);
+            }
+            return null;
+        });
+
+        Optional<Question> result = dialog.showAndWait();
+        result.ifPresent(question -> {
+            QuestionDatabase.addQuestion(question, currentQuiz.getId());
+            loadQuestions();
+        });
     }
 
     private void deleteQuestion(Question question) {

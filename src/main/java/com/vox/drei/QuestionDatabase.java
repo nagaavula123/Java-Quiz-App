@@ -11,19 +11,13 @@ public class QuestionDatabase {
     static {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
-            // Create Quiz table
             stmt.execute("CREATE TABLE IF NOT EXISTS quizzes (id TEXT PRIMARY KEY, name TEXT, category TEXT)");
-
-            // Create Question table
-            stmt.execute("CREATE TABLE IF NOT EXISTS questions (id TEXT PRIMARY KEY, quiz_id TEXT, question TEXT, type TEXT, FOREIGN KEY(quiz_id) REFERENCES quizzes(id))");
-
-            // Create Answer table
-            stmt.execute("CREATE TABLE IF NOT EXISTS answers (id TEXT PRIMARY KEY, question_id TEXT, answer TEXT, is_correct INTEGER, FOREIGN KEY(question_id) REFERENCES questions(id))");
+            stmt.execute("CREATE TABLE IF NOT EXISTS questions (id TEXT PRIMARY KEY, quiz_id TEXT, question TEXT, type TEXT, correct_answer TEXT, FOREIGN KEY(quiz_id) REFERENCES quizzes(id))");
+            stmt.execute("CREATE TABLE IF NOT EXISTS answers (id TEXT PRIMARY KEY, question_id TEXT, answer TEXT, FOREIGN KEY(question_id) REFERENCES questions(id))");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
 
     public static void addQuiz(Quiz quiz) {
         String sql = "INSERT INTO quizzes(id, name, category) VALUES(?,?,?)";
@@ -54,7 +48,9 @@ public class QuestionDatabase {
     public static void deleteQuiz(String quizId) {
         String sql = "DELETE FROM quizzes WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt =
+
+                     conn.prepareStatement(sql)) {
             pstmt.setString(1, quizId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -82,32 +78,32 @@ public class QuestionDatabase {
         return quizzes;
     }
 
-    public static void addQuestion(Question question, String quizId) {
-        String sql = "INSERT INTO questions(id, quiz_id, question, type) VALUES(?,?,?,?)";
+    public static void addQuestion(Question  question, String quizId) {
+        String sql = "INSERT INTO questions(id, quiz_id, question, type, correct_answer) VALUES(?,?,?,?,?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, question.getId());
             pstmt.setString(2, quizId);
             pstmt.setString(3, question.getQuestion());
             pstmt.setString(4, question.getType());
+            pstmt.setString(5, question.getCorrectAnswer());
             pstmt.executeUpdate();
 
-            for (int i = 0; i < question.getAnswers().size(); i++) {
-                addAnswer(question.getId(), question.getAnswers().get(i), i == question.getCorrectAnswerIndex());
+            for (String answer : question.getAnswers()) {
+                addAnswer(question.getId(), answer);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private static void addAnswer(String questionId, String answer, boolean isCorrect) {
-        String sql = "INSERT INTO answers(id, question_id, answer, is_correct) VALUES(?,?,?,?)";
+    private static void addAnswer(String questionId, String answer) {
+        String sql = "INSERT INTO answers(id, question_id, answer) VALUES(?,?,?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, UUID.randomUUID().toString());
             pstmt.setString(2, questionId);
             pstmt.setString(3, answer);
-            pstmt.setInt(4, isCorrect ? 1 : 0);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -115,20 +111,19 @@ public class QuestionDatabase {
     }
 
     public static void updateQuestion(Question question) {
-        String sql = "UPDATE questions SET question = ?, type = ? WHERE id = ?";
+        String sql = "UPDATE questions SET question = ?, type = ?, correct_answer = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, question.getQuestion());
             pstmt.setString(2, question.getType());
-            pstmt.setString(3, question.getId());
+            pstmt.setString(3, question.getCorrectAnswer());
+            pstmt.setString(4, question.getId());
             pstmt.executeUpdate();
 
-            // Delete old answers
             deleteAnswers(question.getId());
 
-            // Add new answers
             for (String answer : question.getAnswers()) {
-                addAnswer(question.getId(), answer, question.getAnswers().indexOf(answer) == question.getCorrectAnswerIndex());
+                addAnswer(question.getId(), answer);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -170,8 +165,8 @@ public class QuestionDatabase {
                 question.setId(rs.getString("id"));
                 question.setQuestion(rs.getString("question"));
                 question.setType(rs.getString("type"));
+                question.setCorrectAnswer(rs.getString("correct_answer"));
                 question.setAnswers(getAnswersForQuestion(question.getId()));
-                question.setCorrectAnswerIndex(getCorrectAnswerIndex(question.getId()));
                 questions.add(question);
             }
         } catch (SQLException e) {
@@ -179,6 +174,7 @@ public class QuestionDatabase {
         }
         return questions;
     }
+
 
     private static List<String> getAnswersForQuestion(String questionId) {
         List<String> answers = new ArrayList<>();
@@ -194,25 +190,6 @@ public class QuestionDatabase {
             e.printStackTrace();
         }
         return answers;
-    }
-
-    private static int getCorrectAnswerIndex(String questionId) {
-        String sql = "SELECT * FROM answers WHERE question_id = ? ORDER BY id";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, questionId);
-            ResultSet rs = pstmt.executeQuery();
-            int index = 0;
-            while (rs.next()) {
-                if (rs.getInt("is_correct") == 1) {
-                    return index;
-                }
-                index++;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1;
     }
 
     public static List<Quiz> searchQuizzes(String searchTerm, String category, int numberOfQuestions) {

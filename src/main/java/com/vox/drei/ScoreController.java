@@ -7,8 +7,6 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-import static javafx.scene.control.TableView.*;
-
 public class ScoreController {
     @FXML private VBox rootVBox;
     @FXML private Label quizNameLabel;
@@ -23,15 +21,12 @@ public class ScoreController {
 
     @FXML
     public void initialize() {
-        // Set column resize policy
         answersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Set column widths
-        questionColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40); // 40% width
-        userAnswerColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
-        correctAnswerColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
+        questionColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40);
+        userAnswerColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
+        correctAnswerColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
 
-        // Set grow priority
         VBox.setVgrow(answersTable, Priority.ALWAYS);
     }
 
@@ -51,23 +46,10 @@ public class ScoreController {
 
     private void populateAnswersTable() {
         questionColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getQuestion()));
-        userAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(getUserAnswerDisplay(cellData.getValue())));
-        correctAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(getCorrectAnswer(cellData.getValue())));
+        userAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getUserAnswer()));
+        correctAnswerColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getCorrectAnswer()));
 
         answersTable.getItems().setAll(questions);
-    }
-
-    private String getUserAnswerDisplay(Question question) {
-        if (question.getType().equals("MULTIPLE_CHOICE")) {
-            int userAnswerIndex = Integer.parseInt(question.getUserAnswer());
-            return question.getAnswers().get(userAnswerIndex);
-        } else {
-            return question.getUserAnswer();
-        }
-    }
-
-    private String getCorrectAnswer(Question question) {
-        return question.getAnswers().get(question.getCorrectAnswerIndex());
     }
 
     @FXML
