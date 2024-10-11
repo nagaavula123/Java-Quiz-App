@@ -14,4 +14,13 @@
     <Label fx:id="scoreLabel" styleClass="score-label"/>
     <Button text="View Answers" onAction="#viewAnswers"/>
     <Button text="Back to Main Menu" onAction="#backToMain"/>
+
+    <!-- TableView for displaying the answers -->
+    <TableView fx:id="answersTable" visible="false">
+        <columns>
+            <TableColumn fx:id="questionColumn" text="Question"/>
+            <TableColumn fx:id="userAnswerColumn" text="Your Answer"/>
+            <TableColumn fx:id="correctAnswerColumn" text="Correct Answer"/>
+        </columns>
+    </TableView>
 </VBox>

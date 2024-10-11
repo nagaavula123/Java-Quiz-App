@@ -55,4 +55,12 @@ public class ScoreController {
     private void backToMain() throws Exception {
         DreiMain.showMainView();
     }
+
+    @FXML
+    private void viewAnswers() {
+        // Logic for viewing answers goes here
+        // You can show the TableView (answersTable) or any other UI element with the answers
+        answersTable.setVisible(true);  // If hidden by default, make it visible here
+    }
+
 }
