@@ -2,6 +2,7 @@ package com.vox.drei;
 
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -29,21 +30,8 @@ public class ManageQuestionsController {
     @FXML private TextField searchField;
 
     private Quiz currentQuiz;
-    private List<Question> questions;
     private ObservableList<Question> observableQuestions;
     private FilteredList<Question> filteredQuestions;
-
-    public void setQuiz(Quiz quiz) {
-        this.currentQuiz = quiz;
-        loadQuestions();
-    }
-
-    private void loadQuestions() {
-        questions = QuestionDatabase.getQuestionsForQuiz(currentQuiz.getId());
-        observableQuestions = FXCollections.observableArrayList(questions);
-        filteredQuestions = new FilteredList<>(observableQuestions, p -> true);
-        questionsTable.setItems(filteredQuestions);
-    }
 
     @FXML
     public void initialize() {
@@ -57,7 +45,29 @@ public class ManageQuestionsController {
 
         VBox.setVgrow(questionsTable, Priority.ALWAYS);
 
+        // Initialize with an empty list
+        observableQuestions = FXCollections.observableArrayList();
+        filteredQuestions = new FilteredList<>(observableQuestions, p -> true);
+        questionsTable.setItems(filteredQuestions);
+
         setupSearch();
+        setupSorting();
+    }
+
+    public void setQuiz(Quiz quiz) {
+        this.currentQuiz = quiz;
+        loadQuestions();
+    }
+
+    private void loadQuestions() {
+        List<Question> questions = QuestionDatabase.getQuestionsForQuiz(currentQuiz.getId());
+        observableQuestions.setAll(questions);
+    }
+
+    private void setupSorting() {
+        SortedList<Question> sortedQuestions = new SortedList<>(filteredQuestions);
+        sortedQuestions.comparatorProperty().bind(questionsTable.comparatorProperty());
+        questionsTable.setItems(sortedQuestions);
     }
 
     private void setupSearch() {
@@ -84,6 +94,7 @@ public class ManageQuestionsController {
         questionColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getQuestion()));
         typeColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getType()));
 
+        // Setup for actions column
         actionsColumn.setCellFactory(param -> new TableCell<>() {
             private final Button editButton = new Button("Edit");
             private final Button deleteButton = new Button("Delete");

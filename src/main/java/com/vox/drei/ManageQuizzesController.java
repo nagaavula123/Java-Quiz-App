@@ -2,6 +2,7 @@ package com.vox.drei;
 
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -42,6 +43,7 @@ public class ManageQuizzesController {
         VBox.setVgrow(quizzesTable, Priority.ALWAYS);
 
         setupSearch();
+        setupSorting();
     }
 
     private void setupSearch() {
@@ -68,6 +70,12 @@ public class ManageQuizzesController {
         observableQuizzes = FXCollections.observableArrayList(quizzes);
         filteredQuizzes = new FilteredList<>(observableQuizzes, p -> true);
         quizzesTable.setItems(filteredQuizzes);
+    }
+
+    private void setupSorting() {
+        SortedList<Quiz> sortedQuizzes = new SortedList<>(filteredQuizzes);
+        sortedQuizzes.comparatorProperty().bind(quizzesTable.comparatorProperty());
+        quizzesTable.setItems(sortedQuizzes);
     }
 
     private void setupTable() {
