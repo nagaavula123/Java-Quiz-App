@@ -16,6 +16,7 @@ public class AddQuestionController {
     @FXML private VBox answersBox;
     @FXML private ComboBox<String> correctAnswerComboBox;
     @FXML private ComboBox<String> questionTypeComboBox;
+    @FXML private Button saveButton;
 
     private Quiz currentQuiz;
 
@@ -23,6 +24,13 @@ public class AddQuestionController {
     public void initialize() {
         questionTypeComboBox.setItems(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
         questionTypeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updateAnswersBox(newVal));
+
+        // Disable save button by default
+        saveButton.setDisable(true);
+
+        // Add listeners to enable/disable save button
+        questionField.textProperty().addListener((obs, oldVal, newVal) -> validateForm());
+        correctAnswerComboBox.valueProperty().addListener((obs, oldVal, newVal) -> validateForm());
     }
 
     public void setQuiz(Quiz quiz) {
@@ -36,21 +44,23 @@ public class AddQuestionController {
                 TextField answerField = new TextField();
                 answerField.setPromptText("Answer " + i);
                 answersBox.getChildren().add(answerField);
+
+                // Add listener to update correct answer options
+                answerField.textProperty().addListener((obs, oldVal, newVal) -> updateCorrectAnswerOptions());
             }
             correctAnswerComboBox = new ComboBox<>();
             correctAnswerComboBox.setPromptText("Select correct answer");
             answersBox.getChildren().add(correctAnswerComboBox);
 
-            // Update correct answer options when answer fields change
-            for (int i = 0; i < 4; i++) {
-                final int index = i;
-                TextField field = (TextField) answersBox.getChildren().get(i);
-                field.textProperty().addListener((obs, oldVal, newVal) -> updateCorrectAnswerOptions());
-            }
+            // Add listener to validate form when correct answer is selected
+            correctAnswerComboBox.valueProperty().addListener((obs, oldVal, newVal) -> validateForm());
         } else {
             TextField answerField = new TextField();
             answerField.setPromptText("Correct Answer");
             answersBox.getChildren().add(answerField);
+
+            // Add listener to validate form when answer is entered
+            answerField.textProperty().addListener((obs, oldVal, newVal) -> validateForm());
         }
     }
 
@@ -64,6 +74,25 @@ public class AddQuestionController {
             }
         }
         correctAnswerComboBox.setItems(FXCollections.observableArrayList(options));
+        validateForm();
+    }
+
+    private void validateForm() {
+        boolean isValid = !questionField.getText().trim().isEmpty();
+
+        if ("MULTIPLE_CHOICE".equals(questionTypeComboBox.getValue())) {
+            int nonEmptyAnswers = (int) answersBox.getChildren().stream()
+                    .filter(node -> node instanceof TextField)
+                    .map(node -> ((TextField) node).getText().trim())
+                    .filter(text -> !text.isEmpty())
+                    .count();
+            isValid = isValid && nonEmptyAnswers >= 4 && correctAnswerComboBox.getValue() != null;
+        } else {
+            TextField answerField = (TextField) answersBox.getChildren().get(0);
+            isValid = isValid && !answerField.getText().trim().isEmpty();
+        }
+
+        saveButton.setDisable(!isValid);
     }
 
     @FXML

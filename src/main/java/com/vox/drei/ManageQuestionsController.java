@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +24,6 @@ public class ManageQuestionsController {
     @FXML private TableColumn<Question, String> questionColumn;
     @FXML private TableColumn<Question, String> typeColumn;
     @FXML private TableColumn<Question, Void> actionsColumn;
-
 
     private Quiz currentQuiz;
     private List<Question> questions;
@@ -117,6 +115,12 @@ public class ManageQuestionsController {
 
         dialog.getDialogPane().setContent(scrollPane);
 
+        Button saveButton = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
+        saveButton.setDisable(true);
+
+        questionField.textProperty().addListener((obs, oldVal, newVal) -> validateEditForm(saveButton, questionField, answersBox, typeComboBox));
+        typeComboBox.valueProperty().addListener((obs, oldVal, newVal) -> validateEditForm(saveButton, questionField, answersBox, typeComboBox));
+
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
                 question.setQuestion(questionField.getText());
@@ -153,6 +157,9 @@ public class ManageQuestionsController {
     private void updateAnswersBox(VBox answersBox, String type, Question question) {
         answersBox.getChildren().clear();
         if (type.equals("MULTIPLE_CHOICE")) {
+            ComboBox<String> correctAnswerComboBox = new ComboBox<>();
+            correctAnswerComboBox.setPromptText("Select correct answer");
+
             for (int i = 0; i < 4; i++) {
                 TextField answerField = new TextField();
                 answerField.setPromptText("Answer " + (i + 1));
@@ -160,19 +167,33 @@ public class ManageQuestionsController {
                     answerField.setText(question.getAnswers().get(i));
                 }
                 answersBox.getChildren().add(answerField);
+
+                final int index = i;
+                answerField.textProperty().addListener((obs, oldVal, newVal) -> {
+                    updateCorrectAnswerOptions(answersBox, correctAnswerComboBox);
+                    Button saveButton = (Button) answersBox.getScene().getWindow().getScene().getRoot().lookup(".button-bar .button:first-child");
+                    validateEditForm(saveButton,
+                            (TextField) answersBox.getParent().getChildrenUnmodifiable().get(1),
+                            answersBox,
+                            (ComboBox<String>) answersBox.getParent().getChildrenUnmodifiable().get(3));
+                });
             }
-            ComboBox<String> correctAnswerComboBox = new ComboBox<>();
-            correctAnswerComboBox.setPromptText("Select correct answer");
-            correctAnswerComboBox.setItems(FXCollections.observableArrayList(
-                    IntStream.rangeClosed(1, 4)
-                            .mapToObj(i -> "Answer " + i)
-                            .collect(Collectors.toList())
-            ));
+
+            answersBox.getChildren().add(correctAnswerComboBox);
+            updateCorrectAnswerOptions(answersBox, correctAnswerComboBox);
+
             if (question != null) {
                 int correctAnswerIndex = question.getAnswers().indexOf(question.getCorrectAnswer()) + 1;
                 correctAnswerComboBox.setValue("Answer " + correctAnswerIndex);
             }
-            answersBox.getChildren().add(correctAnswerComboBox);
+
+            correctAnswerComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+                Button saveButton = (Button) answersBox.getScene().getWindow().getScene().getRoot().lookup(".button-bar .button:first-child");
+                validateEditForm(saveButton,
+                        (TextField) answersBox.getParent().getChildrenUnmodifiable().get(1),
+                        answersBox,
+                        (ComboBox<String>) answersBox.getParent().getChildrenUnmodifiable().get(3));
+            });
         } else {
             TextField answerField = new TextField();
             answerField.setPromptText("Correct Answer");
@@ -180,7 +201,46 @@ public class ManageQuestionsController {
                 answerField.setText(question.getCorrectAnswer());
             }
             answersBox.getChildren().add(answerField);
+
+            answerField.textProperty().addListener((obs, oldVal, newVal) -> {
+                Button saveButton = (Button) answersBox.getScene().getWindow().getScene().getRoot().lookup(".button-bar .button:first-child");
+                validateEditForm(saveButton,
+                        (TextField) answersBox.getParent().getChildrenUnmodifiable().get(1),
+                        answersBox,
+                        (ComboBox<String>) answersBox.getParent().getChildrenUnmodifiable().get(3));
+            });
         }
+    }
+
+    private void updateCorrectAnswerOptions(VBox answersBox, ComboBox<String> correctAnswerComboBox) {
+        List<String> options = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            TextField field = (TextField) answersBox.getChildren().get(i);
+            String text = field.getText().trim();
+            if (!text.isEmpty()) {
+                options.add("Answer " + (i + 1));
+            }
+        }
+        correctAnswerComboBox.setItems(FXCollections.observableArrayList(options));
+    }
+
+    private void validateEditForm(Button saveButton, TextField questionField, VBox answersBox, ComboBox<String> typeComboBox) {
+        boolean isValid = !questionField.getText().trim().isEmpty();
+
+        if ("MULTIPLE_CHOICE".equals(typeComboBox.getValue())) {
+            int nonEmptyAnswers = (int) answersBox.getChildren().stream()
+                    .filter(node -> node instanceof TextField)
+                    .map(node -> ((TextField) node).getText().trim())
+                    .filter(text -> !text.isEmpty())
+                    .count();
+            ComboBox<String> correctAnswerComboBox = (ComboBox<String>) answersBox.getChildren().get(4);
+            isValid = isValid && nonEmptyAnswers >= 4 && correctAnswerComboBox.getValue() != null;
+        } else {
+            TextField answerField = (TextField) answersBox.getChildren().get(0);
+            isValid = isValid && !answerField.getText().trim().isEmpty();
+        }
+
+        saveButton.setDisable(!isValid);
     }
 
     @FXML
@@ -222,11 +282,11 @@ public class ManageQuestionsController {
         scrollPane.setContent(content);
         dialog.getDialogPane().setContent(scrollPane);
 
-        Node saveButton = dialog.getDialogPane().lookupButton(saveButtonType);
+        Button saveButton = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
         saveButton.setDisable(true);
 
         questionField.textProperty().addListener((observable, oldValue, newValue) -> {
-            saveButton.setDisable(newValue.trim().isEmpty());
+            validateEditForm(saveButton, questionField, answersBox, typeComboBox);
         });
 
         dialog.setResultConverter(dialogButton -> {
@@ -250,7 +310,6 @@ public class ManageQuestionsController {
                     answers = List.of(correctAnswer);
                 }
 
-                // Use the updated constructor
                 return new Question(questionText, answers, correctAnswer, type);
             }
             return null;
@@ -277,6 +336,8 @@ public class ManageQuestionsController {
             loadQuestions();
         }
     }
+
+
 
     @FXML
     private void backToManageQuizzes() throws Exception {
