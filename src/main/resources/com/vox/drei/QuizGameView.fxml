@@ -6,7 +6,12 @@
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.QuizGameController"
       spacing="20" alignment="CENTER" stylesheets="@styles.css">
     <Label fx:id="questionLabel" styleClass="question-label"/>
-    <GridPane fx:id="answerGrid" alignment="CENTER" hgap="10" vgap="10" style="-fx-text-fill: black;"/>
+    <GridPane fx:id="answerGrid" alignment="CENTER" hgap="10" vgap="10"/>
     <Label fx:id="timerLabel" styleClass="timer-label"/>
-    <Button text="Next Question" onAction="#nextQuestion"/>
+    <Label fx:id="notificationLabel" styleClass="notification-label"/>
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="nextQuestionButton" text="Next Question" onAction="#nextQuestion"/>
+        <Button fx:id="toggleTimerButton" text="Pause Timer" onAction="#toggleTimer"/>
+        <Button fx:id="exitQuizButton" text="Exit Quiz" onAction="#exitQuiz"/>
+    </HBox>
 </VBox>

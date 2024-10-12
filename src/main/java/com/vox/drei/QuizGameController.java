@@ -1,16 +1,13 @@
 package com.vox.drei;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.util.Duration;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -20,14 +17,23 @@ public class QuizGameController {
     @FXML private Label questionLabel;
     @FXML private GridPane answerGrid;
     @FXML private Label timerLabel;
+    @FXML private Button nextQuestionButton;
+    @FXML private Button exitQuizButton;
+    @FXML private Button toggleTimerButton;
+    @FXML private Label notificationLabel;
 
     private static Quiz currentQuiz;
     private List<Question> questions;
     private int currentQuestionIndex = 0;
     private int score = 0;
-    private int timeRemaining;
-    private Timeline timer;
     private Preferences prefs = Preferences.userNodeForPackage(QuizSettingsController.class);
+    private boolean answerSubmitted = false;
+
+    private Instant startTime;
+    private Duration elapsedTime = Duration.ZERO;
+    private Duration remainingTime;
+    private AnimationTimer timer;
+    private boolean timerRunning = false;
 
     public static void setCurrentQuiz(Quiz quiz) {
         currentQuiz = quiz;
@@ -40,12 +46,13 @@ public class QuizGameController {
             return;
         }
         loadQuestions();
+        initializeTimer();
         displayQuestion();
-        if (prefs.getBoolean("timerEnabled", true)) {
-            startTimer();
-        } else {
+        if (!prefs.getBoolean("timerEnabled", true)) {
             timerLabel.setVisible(false);
+            toggleTimerButton.setVisible(false);
         }
+        notificationLabel.setVisible(false);
     }
 
     private void loadQuestions() {
@@ -62,18 +69,7 @@ public class QuizGameController {
         }
 
         Question currentQuestion = questions.get(currentQuestionIndex);
-
-        FadeTransition fadeOut = new FadeTransition(Duration.millis(500), questionLabel);
-        fadeOut.setFromValue(1.0);
-        fadeOut.setToValue(0.0);
-        fadeOut.setOnFinished(e -> {
-            questionLabel.setText(currentQuestion.getQuestion());
-            FadeTransition fadeIn = new FadeTransition(Duration.millis(500), questionLabel);
-            fadeIn.setFromValue(0.0);
-            fadeIn.setToValue(1.0);
-            fadeIn.play();
-        });
-        fadeOut.play();
+        questionLabel.setText(currentQuestion.getQuestion());
 
         answerGrid.getChildren().clear();
 
@@ -84,6 +80,9 @@ public class QuizGameController {
         }
 
         resetTimer();
+        notificationLabel.setVisible(false);
+        answerSubmitted = false;
+        toggleTimerButton.setDisable(false);
     }
 
     private void displayMultipleChoiceQuestion(Question currentQuestion) {
@@ -93,65 +92,103 @@ public class QuizGameController {
             RadioButton rb = new RadioButton(answers.get(i));
             rb.setToggleGroup(group);
             rb.setUserData(answers.get(i));
-
             answerGrid.add(rb, 0, i);
-
-            FadeTransition ft = new FadeTransition(Duration.millis(500), rb);
-            ft.setFromValue(0.0);
-            ft.setToValue(1.0);
-            ft.setDelay(Duration.millis(i * 100));
-            ft.play();
         }
     }
 
     private void displayIdentificationQuestion() {
         TextField answerField = new TextField();
-        answerField.setPromptText("Enter your answer here");
-
+        answerField.setPromptText("Type your answer here");
+        answerField.setStyle("-fx-prompt-text-fill: #808080;"); // Dark gray prompt text
         answerGrid.add(answerField, 0, 0);
-
-        FadeTransition ft = new FadeTransition(Duration.millis(500), answerField);
-        ft.setFromValue(0.0);
-        ft.setToValue(1.0);
-        ft.play();
     }
 
-    private void startTimer() {
-        timeRemaining = prefs.getInt("timePerQuestion", 15);
-        updateTimerLabel();
+    private void initializeTimer() {
+        remainingTime = Duration.ofSeconds(prefs.getInt("timePerQuestion", 15));
+        timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (startTime == null) {
+                    startTime = Instant.now();
+                }
+                Duration currentElapsed = Duration.between(startTime, Instant.now());
+                Duration totalElapsed = elapsedTime.plus(currentElapsed);
+                Duration timeLeft = remainingTime.minus(totalElapsed);
 
-        timer = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-            timeRemaining--;
-            updateTimerLabel();
-            if (timeRemaining <= 0) {
-                nextQuestion();
+                if (timeLeft.isZero() || timeLeft.isNegative()) {
+                    handleTimeUp();
+                } else {
+                    updateTimerLabel(timeLeft);
+                }
             }
-        }));
-        timer.setCycleCount(Timeline.INDEFINITE);
-        timer.play();
+        };
     }
 
     private void resetTimer() {
         if (timer != null) {
             timer.stop();
         }
+        remainingTime = Duration.ofSeconds(prefs.getInt("timePerQuestion", 15));
+        startTime = null;
+        elapsedTime = Duration.ZERO;
         if (prefs.getBoolean("timerEnabled", true)) {
             startTimer();
         }
     }
 
-    private void updateTimerLabel() {
-        timerLabel.setText("Time: " + timeRemaining);
+    private void startTimer() {
+        if (timer == null) {
+            initializeTimer();
+        }
+        startTime = Instant.now();
+        timer.start();
+        timerRunning = true;
+        toggleTimerButton.setText("Pause Timer");
+    }
+
+    private void pauseTimer() {
+        if (timer != null) {
+            timer.stop();
+            elapsedTime = elapsedTime.plus(Duration.between(startTime, Instant.now()));
+            timerRunning = false;
+            toggleTimerButton.setText("Resume Timer");
+        }
+    }
+
+    private void updateTimerLabel(Duration timeLeft) {
+        Platform.runLater(() -> timerLabel.setText("Time: " + timeLeft.getSeconds()));
+    }
+
+    private void handleTimeUp() {
+        if (timer != null) {
+            timer.stop();
+        }
+        timerRunning = false;
+        Platform.runLater(() -> {
+            notificationLabel.setText("Time's up! Click 'Next Question' to continue.");
+            notificationLabel.setVisible(true);
+            nextQuestionButton.setDisable(false);
+            toggleTimerButton.setDisable(true);
+            disableAnswerControls();
+        });
+    }
+
+    private void disableAnswerControls() {
+        for (javafx.scene.Node node : answerGrid.getChildren()) {
+            node.setDisable(true);
+        }
     }
 
     @FXML
     private void nextQuestion() {
-        if (!isAnswerSelected()) {
-            showAlert("No Answer Selected", "Please set an answer before moving to the next question.");
-            return;
+        if (timerRunning) {
+            if (!isAnswerSelected()) {
+                showAlert("No Answer Selected", "Please select an answer before moving to the next question.");
+                return;
+            }
+            checkAnswer();
         }
 
-        checkAnswer();
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.size()) {
             displayQuestion();
@@ -177,10 +214,14 @@ public class QuizGameController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
-        alert.showAndWait();
+        alert.show();
     }
 
     private void checkAnswer() {
+        if (answerSubmitted) {
+            return;
+        }
+
         Question currentQuestion = questions.get(currentQuestionIndex);
         if (currentQuestion.getType().equals("MULTIPLE_CHOICE")) {
             ToggleGroup group = ((RadioButton) answerGrid.getChildren().get(0)).getToggleGroup();
@@ -199,6 +240,7 @@ public class QuizGameController {
                 score++;
             }
         }
+        answerSubmitted = true;
     }
 
     private void finishQuiz() {
@@ -209,6 +251,33 @@ public class QuizGameController {
             DreiMain.showScoreView(score, questions.size(), questions, currentQuiz.getName());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void exitQuiz() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Exit Quiz");
+        alert.setHeaderText("Are you sure you want to exit the quiz?");
+        alert.setContentText("Your progress will be lost.");
+
+        alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try {
+                    DreiMain.showMainView();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void toggleTimer() {
+        if (timerRunning) {
+            pauseTimer();
+        } else {
+            startTimer();
         }
     }
 }
