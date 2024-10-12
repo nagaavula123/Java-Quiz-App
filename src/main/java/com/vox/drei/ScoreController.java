@@ -63,11 +63,6 @@ public class ScoreController {
         answersTable.setVisible(true);
 
         Stage stage = (Stage) rootVBox.getScene().getWindow();
-        double newHeight = 600;
-        double newWidth = 800;
-
-        stage.setHeight(newHeight);
-        stage.setWidth(newWidth);
 
         // Center the stage on the screen
         stage.centerOnScreen();

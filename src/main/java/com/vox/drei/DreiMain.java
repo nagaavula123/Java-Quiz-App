@@ -51,6 +51,16 @@ public class DreiMain extends Application {
         primaryStage.show();
     }
 
+    public static void showScoreView(int score, int totalQuestions, List<Question> questions, String quizName) throws Exception {
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("ScoreView.fxml"));
+        Parent scoreView = loader.load();
+        ScoreController controller = loader.getController();
+        controller.setScore(score, totalQuestions);
+        controller.setQuestions(questions);
+        controller.setQuizName(quizName);
+        setView(scoreView);
+    }
+
     private static void initializeParticles() {
         particles = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
@@ -64,7 +74,7 @@ public class DreiMain extends Application {
             @Override
             public void handle(long now) {
                 if (prefs.getBoolean("animationEnabled", true)) {
-                    gc.setFill(Color.rgb(26, 42, 108, 0.1));
+                    gc.setFill(Color.rgb(240, 248, 255, 0.3)); // Light blue background with some transparency
                     gc.fillRect(0, 0, backgroundCanvas.getWidth(), backgroundCanvas.getHeight());
 
                     for (Particle p : particles) {
@@ -72,7 +82,7 @@ public class DreiMain extends Application {
                         p.draw(gc);
                     }
                 } else {
-                    gc.setFill(Color.rgb(26, 42, 108, 1));
+                    gc.setFill(Color.rgb(240, 248, 255, 1)); // Solid light blue background
                     gc.fillRect(0, 0, backgroundCanvas.getWidth(), backgroundCanvas.getHeight());
                 }
             }

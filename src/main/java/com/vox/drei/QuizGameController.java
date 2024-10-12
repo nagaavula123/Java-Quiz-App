@@ -206,15 +206,7 @@ public class QuizGameController {
             timer.stop();
         }
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ScoreView.fxml"));
-            Parent root = loader.load();
-            ScoreController scoreController = loader.getController();
-            scoreController.setScore(score, questions.size());
-            scoreController.setQuestions(questions);
-            scoreController.setQuizName(currentQuiz.getName());
-
-            Scene scene = new Scene(root, 600, 400);
-            DreiMain.getPrimaryStage().setScene(scene);
+            DreiMain.showScoreView(score, questions.size(), questions, currentQuiz.getName());
         } catch (Exception e) {
             e.printStackTrace();
         }
