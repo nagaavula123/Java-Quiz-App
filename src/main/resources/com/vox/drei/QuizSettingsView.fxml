@@ -15,6 +15,7 @@
 
         <CheckBox fx:id="timerEnabledCheckBox" text="Enable Timer" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2" style="-fx-text-fill: black;"/>
         <CheckBox fx:id="animationEnabledCheckBox" text="Enable Background Animation" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2" style="-fx-text-fill: black;"/>
+        <CheckBox fx:id="immediateAnswerCheckBox" text="Immediately Show Correct Answer" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2" style="-fx-text-fill: black;"/>
     </GridPane>
     <HBox spacing="10" alignment="CENTER">
         <Button text="Save Settings" onAction="#saveSettings"/>

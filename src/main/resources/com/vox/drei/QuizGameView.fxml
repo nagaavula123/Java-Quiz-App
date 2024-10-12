@@ -9,9 +9,11 @@
     <GridPane fx:id="answerGrid" alignment="CENTER" hgap="10" vgap="10"/>
     <Label fx:id="timerLabel" styleClass="timer-label"/>
     <Label fx:id="notificationLabel" styleClass="notification-label"/>
-    <HBox spacing="10" alignment="CENTER">
+    <Label fx:id="correctAnswerLabel" styleClass="correct-answer-label"/>
+    <VBox spacing="10" alignment="CENTER">
+        <Button fx:id="submitAnswerButton" text="Submit Answer" onAction="#submitAnswer"/>
         <Button fx:id="nextQuestionButton" text="Next Question" onAction="#nextQuestion"/>
         <Button fx:id="toggleTimerButton" text="Pause Timer" onAction="#toggleTimer"/>
         <Button fx:id="exitQuizButton" text="Exit Quiz" onAction="#exitQuiz"/>
-    </HBox>
+    </VBox>
 </VBox>

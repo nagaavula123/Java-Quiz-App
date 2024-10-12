@@ -11,8 +11,9 @@ public class QuizSettingsController {
     @FXML private TextField numQuestionsField;
     @FXML private TextField timePerQuestionField;
     @FXML private CheckBox timerEnabledCheckBox;
-    @FXML private Label notificationLabel;// Add this field
+    @FXML private Label notificationLabel;
     @FXML private CheckBox animationEnabledCheckBox;
+    @FXML private CheckBox immediateAnswerCheckBox; // New checkbox for immediate answer feature
 
     private Preferences prefs = Preferences.userNodeForPackage(QuizSettingsController.class);
 
@@ -22,6 +23,7 @@ public class QuizSettingsController {
         timePerQuestionField.setText(String.valueOf(prefs.getInt("timePerQuestion", 15)));
         timerEnabledCheckBox.setSelected(prefs.getBoolean("timerEnabled", true));
         animationEnabledCheckBox.setSelected(prefs.getBoolean("animationEnabled", true));
+        immediateAnswerCheckBox.setSelected(prefs.getBoolean("immediateAnswerEnabled", false)); // Initialize the new checkbox
     }
 
     @FXML
@@ -31,11 +33,13 @@ public class QuizSettingsController {
             int timePerQuestion = Integer.parseInt(timePerQuestionField.getText());
             boolean timerEnabled = timerEnabledCheckBox.isSelected();
             boolean animationEnabled = animationEnabledCheckBox.isSelected();
+            boolean immediateAnswerEnabled = immediateAnswerCheckBox.isSelected(); // Get the state of the new checkbox
 
             prefs.putBoolean("animationEnabled", animationEnabled);
             prefs.putInt("numQuestions", numQuestions);
             prefs.putInt("timePerQuestion", timePerQuestion);
             prefs.putBoolean("timerEnabled", timerEnabled);
+            prefs.putBoolean("immediateAnswerEnabled", immediateAnswerEnabled); // Save the state of the new feature
 
             notificationLabel.setText("Settings saved successfully!");
         } catch (NumberFormatException e) {

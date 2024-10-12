@@ -18,9 +18,11 @@ public class QuizGameController {
     @FXML private GridPane answerGrid;
     @FXML private Label timerLabel;
     @FXML private Button nextQuestionButton;
+    @FXML private Button submitAnswerButton; // New button for submitting answers
     @FXML private Button exitQuizButton;
     @FXML private Button toggleTimerButton;
     @FXML private Label notificationLabel;
+    @FXML private Label correctAnswerLabel;
 
     private static Quiz currentQuiz;
     private List<Question> questions;
@@ -28,6 +30,7 @@ public class QuizGameController {
     private int score = 0;
     private Preferences prefs = Preferences.userNodeForPackage(QuizSettingsController.class);
     private boolean answerSubmitted = false;
+    private boolean immediateAnswerEnabled;
 
     private Instant startTime;
     private Duration elapsedTime = Duration.ZERO;
@@ -47,12 +50,41 @@ public class QuizGameController {
         }
         loadQuestions();
         initializeTimer();
+        immediateAnswerEnabled = prefs.getBoolean("immediateAnswerEnabled", false);
+        updateButtonVisibility();
         displayQuestion();
         if (!prefs.getBoolean("timerEnabled", true)) {
             timerLabel.setVisible(false);
             toggleTimerButton.setVisible(false);
         }
         notificationLabel.setVisible(false);
+        correctAnswerLabel.setVisible(false);
+    }
+
+    private void updateButtonVisibility() {
+        if (immediateAnswerEnabled) {
+            submitAnswerButton.setVisible(true);
+            nextQuestionButton.setVisible(false);
+        } else {
+            submitAnswerButton.setVisible(false);
+            nextQuestionButton.setVisible(true);
+        }
+    }
+
+    @FXML
+    private void submitAnswer() {
+        if (!answerSubmitted) {
+            checkAnswer();
+            showCorrectAnswer();
+            submitAnswerButton.setVisible(false);
+            nextQuestionButton.setVisible(true);
+        }
+    }
+
+    private void showCorrectAnswer() {
+        Question currentQuestion = questions.get(currentQuestionIndex);
+        correctAnswerLabel.setText("Correct Answer: " + currentQuestion.getCorrectAnswer());
+        correctAnswerLabel.setVisible(true);
     }
 
     private void loadQuestions() {
@@ -81,8 +113,10 @@ public class QuizGameController {
 
         resetTimer();
         notificationLabel.setVisible(false);
+        correctAnswerLabel.setVisible(false);
         answerSubmitted = false;
         toggleTimerButton.setDisable(false);
+        updateButtonVisibility();
     }
 
     private void displayMultipleChoiceQuestion(Question currentQuestion) {
@@ -181,11 +215,12 @@ public class QuizGameController {
 
     @FXML
     private void nextQuestion() {
-        if (timerRunning) {
-            if (!isAnswerSelected()) {
-                showAlert("No Answer Selected", "Please select an answer before moving to the next question.");
-                return;
-            }
+        if (immediateAnswerEnabled && !answerSubmitted) {
+            // If immediate answer is enabled but the answer hasn't been submitted, do nothing
+            return;
+        }
+
+        if (!immediateAnswerEnabled) {
             checkAnswer();
         }
 
@@ -196,6 +231,7 @@ public class QuizGameController {
             finishQuiz();
         }
     }
+
 
     private boolean isAnswerSelected() {
         Question currentQuestion = questions.get(currentQuestionIndex);
