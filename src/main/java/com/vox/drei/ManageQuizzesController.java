@@ -15,6 +15,7 @@ import java.util.Optional;
 public class ManageQuizzesController {
     @FXML private VBox rootVBox;
     @FXML private TableView<Quiz> quizzesTable;
+    @FXML private TableColumn<Quiz, Integer> numberColumn;
     @FXML private TableColumn<Quiz, String> nameColumn;
     @FXML private TableColumn<Quiz, String> categoryColumn;
     @FXML private TableColumn<Quiz, Void> actionsColumn;
@@ -26,15 +27,13 @@ public class ManageQuizzesController {
         loadQuizzes();
         setupTable();
 
-        // Set column resize policy
         quizzesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Set column widths
-        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
-        categoryColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
-        actionsColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40); // 40% width
+        numberColumn.setMaxWidth(1f * Integer.MAX_VALUE * 10);
+        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
+        categoryColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
+        actionsColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
 
-        // Set grow priority
         VBox.setVgrow(quizzesTable, Priority.ALWAYS);
     }
 
@@ -44,6 +43,7 @@ public class ManageQuizzesController {
     }
 
     private void setupTable() {
+        numberColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getQuizNumber()).asObject());
         nameColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getName()));
         categoryColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getCategory()));
 
@@ -79,6 +79,7 @@ public class ManageQuizzesController {
             loadQuizzes(); // Refresh the table
         }
     }
+
 
     private boolean openEditDialog(Quiz quiz) {
         Dialog<Quiz> dialog = new Dialog<>();

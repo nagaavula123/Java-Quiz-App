@@ -21,9 +21,11 @@ import java.util.stream.IntStream;
 public class ManageQuestionsController {
     @FXML private VBox rootVBox;
     @FXML private TableView<Question> questionsTable;
+    @FXML private TableColumn<Question, Integer> numberColumn;
     @FXML private TableColumn<Question, String> questionColumn;
     @FXML private TableColumn<Question, String> typeColumn;
     @FXML private TableColumn<Question, Void> actionsColumn;
+
 
     private Quiz currentQuiz;
     private List<Question> questions;
@@ -41,17 +43,18 @@ public class ManageQuestionsController {
     @FXML
     public void initialize() {
         setupTable();
-
         questionsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
+        numberColumn.setMaxWidth(1f * Integer.MAX_VALUE * 10);
         questionColumn.setMaxWidth(1f * Integer.MAX_VALUE * 50);
         typeColumn.setMaxWidth(1f * Integer.MAX_VALUE * 20);
-        actionsColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
+        actionsColumn.setMaxWidth(1f * Integer.MAX_VALUE * 20);
 
         VBox.setVgrow(questionsTable, Priority.ALWAYS);
     }
 
     private void setupTable() {
+        numberColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getQuestionNumber()).asObject());
         questionColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getQuestion()));
         typeColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getType()));
 
@@ -230,8 +233,8 @@ public class ManageQuestionsController {
             if (dialogButton == saveButtonType) {
                 String questionText = questionField.getText();
                 String type = typeComboBox.getValue();
-                List<String> answers = new ArrayList<>();
-                String correctAnswer = "";
+                List<String> answers;
+                String correctAnswer;
 
                 if (type.equals("MULTIPLE_CHOICE")) {
                     answers = answersBox.getChildren().stream()
@@ -244,9 +247,10 @@ public class ManageQuestionsController {
                     correctAnswer = answers.get(correctAnswerIndex);
                 } else {
                     correctAnswer = ((TextField) answersBox.getChildren().get(0)).getText();
-                    answers.add(correctAnswer);
+                    answers = List.of(correctAnswer);
                 }
 
+                // Use the updated constructor
                 return new Question(questionText, answers, correctAnswer, type);
             }
             return null;
@@ -254,6 +258,7 @@ public class ManageQuestionsController {
 
         Optional<Question> result = dialog.showAndWait();
         result.ifPresent(question -> {
+            currentQuiz.addQuestion(question);
             QuestionDatabase.addQuestion(question, currentQuiz.getId());
             loadQuestions();
         });
@@ -267,6 +272,7 @@ public class ManageQuestionsController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
+            currentQuiz.removeQuestion(question);
             QuestionDatabase.deleteQuestion(question.getId());
             loadQuestions();
         }

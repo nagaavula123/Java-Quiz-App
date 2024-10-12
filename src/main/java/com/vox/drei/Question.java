@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public class Question {
     private String id;
+    private int questionNumber;
     private String question;
     private List<String> answers;
     private String correctAnswer;
@@ -25,6 +26,8 @@ public class Question {
     }
 
     // Getters and setters
+    public int getQuestionNumber() { return questionNumber; }
+    public void setQuestionNumber(int questionNumber) { this.questionNumber = questionNumber; }
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getQuestion() { return question; }

@@ -11,104 +11,42 @@ public class QuestionDatabase {
     static {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
-            stmt.execute("CREATE TABLE IF NOT EXISTS quizzes (id TEXT PRIMARY KEY, name TEXT, category TEXT)");
-            stmt.execute("CREATE TABLE IF NOT EXISTS questions (id TEXT PRIMARY KEY, quiz_id TEXT, question TEXT, type TEXT, correct_answer TEXT, FOREIGN KEY(quiz_id) REFERENCES quizzes(id))");
+            stmt.execute("CREATE TABLE IF NOT EXISTS quizzes (id TEXT PRIMARY KEY, quiz_number INTEGER, name TEXT, category TEXT)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS questions (id TEXT PRIMARY KEY, quiz_id TEXT, question_number INTEGER, question TEXT, type TEXT, correct_answer TEXT, FOREIGN KEY(quiz_id) REFERENCES quizzes(id))");
             stmt.execute("CREATE TABLE IF NOT EXISTS answers (id TEXT PRIMARY KEY, question_id TEXT, answer TEXT, FOREIGN KEY(question_id) REFERENCES questions(id))");
+
+            // Add quiz_number column if it doesn't exist
+            try {
+                stmt.execute("ALTER TABLE quizzes ADD COLUMN quiz_number INTEGER");
+            } catch (SQLException e) {
+                // Column might already exist, ignore
+            }
+
+            // Add question_number column if it doesn't exist
+            try {
+                stmt.execute("ALTER TABLE questions ADD COLUMN question_number INTEGER");
+            } catch (SQLException e) {
+                // Column might already exist, ignore
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public static void addQuiz(Quiz quiz) {
-        String sql = "INSERT INTO quizzes(id, name, category) VALUES(?,?,?)";
+        String sql = "INSERT INTO quizzes(id, quiz_number, name, category) VALUES(?,?,?,?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, quiz.getId());
-            pstmt.setString(2, quiz.getName());
-            pstmt.setString(3, quiz.getCategory());
+            pstmt.setInt(2, getNextQuizNumber());
+            pstmt.setString(3, quiz.getName());
+            pstmt.setString(4, quiz.getCategory());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static void updateQuiz(Quiz quiz) {
-        String sql = "UPDATE quizzes SET name = ?, category = ? WHERE id = ?";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, quiz.getName());
-            pstmt.setString(2, quiz.getCategory());
-            pstmt.setString(3, quiz.getId());
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void deleteQuiz(String quizId) {
-        String sql = "DELETE FROM quizzes WHERE id = ?";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt =
-
-                     conn.prepareStatement(sql)) {
-            pstmt.setString(1, quizId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static List<Quiz> loadQuizzes() {
-        List<Quiz> quizzes = new ArrayList<>();
-        String sql = "SELECT * FROM quizzes";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                Quiz quiz = new Quiz();
-                quiz.setId(rs.getString("id"));
-                quiz.setName(rs.getString("name"));
-                quiz.setCategory(rs.getString("category"));
-                quiz.setQuestions(getQuestionsForQuiz(quiz.getId()));
-                quizzes.add(quiz);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return quizzes;
-    }
-
-    public static void addQuestion(Question  question, String quizId) {
-        String sql = "INSERT INTO questions(id, quiz_id, question, type, correct_answer) VALUES(?,?,?,?,?)";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, question.getId());
-            pstmt.setString(2, quizId);
-            pstmt.setString(3, question.getQuestion());
-            pstmt.setString(4, question.getType());
-            pstmt.setString(5, question.getCorrectAnswer());
-            pstmt.executeUpdate();
-
-            for (String answer : question.getAnswers()) {
-                addAnswer(question.getId(), answer);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void addAnswer(String questionId, String answer) {
-        String sql = "INSERT INTO answers(id, question_id, answer) VALUES(?,?,?)";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, UUID.randomUUID().toString());
-            pstmt.setString(2, questionId);
-            pstmt.setString(3, answer);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void updateQuestion(Question question) {
         String sql = "UPDATE questions SET question = ?, type = ?, correct_answer = ? WHERE id = ?";
@@ -120,8 +58,8 @@ public class QuestionDatabase {
             pstmt.setString(4, question.getId());
             pstmt.executeUpdate();
 
+            // Update answers
             deleteAnswers(question.getId());
-
             for (String answer : question.getAnswers()) {
                 addAnswer(question.getId(), answer);
             }
@@ -141,21 +79,141 @@ public class QuestionDatabase {
         }
     }
 
-    public static void deleteQuestion(String questionId) {
-        deleteAnswers(questionId);
-        String sql = "DELETE FROM questions WHERE id = ?";
+    private static int getNextQuizNumber() {
+        String sql = "SELECT MAX(quiz_number) FROM quizzes";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1) + 1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 1;
+    }
+
+    public static void addQuestion(Question question, String quizId) {
+        String sql = "INSERT INTO questions(id, quiz_id, question_number, question, type, correct_answer) VALUES(?,?,?,?,?,?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, questionId);
+            pstmt.setString(1, question.getId());
+            pstmt.setString(2, quizId);
+            pstmt.setInt(3, getNextQuestionNumber(quizId));
+            pstmt.setString(4, question.getQuestion());
+            pstmt.setString(5, question.getType());
+            pstmt.setString(6, question.getCorrectAnswer());
+            pstmt.executeUpdate();
+
+            for (String answer : question.getAnswers()) {
+                addAnswer(question.getId(), answer);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static int getNextQuestionNumber(String quizId) {
+        String sql = "SELECT MAX(question_number) FROM questions WHERE quiz_id = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, quizId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) + 1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 1;
+    }
+
+    private static void addAnswer(String questionId, String answer) {
+        String sql = "INSERT INTO answers(id, question_id, answer) VALUES(?,?,?)";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, UUID.randomUUID().toString());
+            pstmt.setString(2, questionId);
+            pstmt.setString(3, answer);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    public static void deleteQuestion(String questionId) {
+        String getQuizIdSql = "SELECT quiz_id, question_number FROM questions WHERE id = ?";
+        String deleteAnswersSql = "DELETE FROM answers WHERE question_id = ?";
+        String deleteQuestionSql = "DELETE FROM questions WHERE id = ?";
+        String updateQuestionNumbersSql = "UPDATE questions SET question_number = question_number - 1 WHERE quiz_id = ? AND question_number > ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            conn.setAutoCommit(false);
+
+            String quizId = null;
+            int questionNumber = 0;
+
+            // Get quiz_id and question_number of the question to be deleted
+            try (PreparedStatement pstmt = conn.prepareStatement(getQuizIdSql)) {
+                pstmt.setString(1, questionId);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    quizId = rs.getString("quiz_id");
+                    questionNumber = rs.getInt("question_number");
+                }
+            }
+
+            // Delete answers
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteAnswersSql)) {
+                pstmt.setString(1, questionId);
+                pstmt.executeUpdate();
+            }
+
+            // Delete question
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteQuestionSql)) {
+                pstmt.setString(1, questionId);
+                pstmt.executeUpdate();
+            }
+
+            // Update question numbers for remaining questions
+            if (quizId != null) {
+                try (PreparedStatement pstmt = conn.prepareStatement(updateQuestionNumbersSql)) {
+                    pstmt.setString(1, quizId);
+                    pstmt.setInt(2, questionNumber);
+                    pstmt.executeUpdate();
+                }
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Quiz> loadQuizzes() {
+        List<Quiz> quizzes = new ArrayList<>();
+        String sql = "SELECT * FROM quizzes ORDER BY quiz_number";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Quiz quiz = new Quiz();
+                quiz.setId(rs.getString("id"));
+                quiz.setQuizNumber(rs.getInt("quiz_number"));
+                quiz.setName(rs.getString("name"));
+                quiz.setCategory(rs.getString("category"));
+                quiz.setQuestions(getQuestionsForQuiz(quiz.getId()));
+                quizzes.add(quiz);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return quizzes;
+    }
+
     public static List<Question> getQuestionsForQuiz(String quizId) {
         List<Question> questions = new ArrayList<>();
-        String sql = "SELECT * FROM questions WHERE quiz_id = ?";
+        String sql = "SELECT * FROM questions WHERE quiz_id = ? ORDER BY question_number";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, quizId);
@@ -163,6 +221,7 @@ public class QuestionDatabase {
             while (rs.next()) {
                 Question question = new Question();
                 question.setId(rs.getString("id"));
+                question.setQuestionNumber(rs.getInt("question_number"));
                 question.setQuestion(rs.getString("question"));
                 question.setType(rs.getString("type"));
                 question.setCorrectAnswer(rs.getString("correct_answer"));
@@ -174,7 +233,6 @@ public class QuestionDatabase {
         }
         return questions;
     }
-
 
     private static List<String> getAnswersForQuestion(String questionId) {
         List<String> answers = new ArrayList<>();
@@ -192,38 +250,69 @@ public class QuestionDatabase {
         return answers;
     }
 
-    public static List<Quiz> searchQuizzes(String searchTerm, String category, int numberOfQuestions) {
-        List<Quiz> quizzes = new ArrayList<>();
-        String sql = "SELECT q.*, COUNT(qu.id) as question_count FROM quizzes q " +
-                "LEFT JOIN questions qu ON q.id = qu.quiz_id " +
-                "WHERE (q.name LIKE ? OR q.category LIKE ?) " +
-                (category != null && !category.isEmpty() ? "AND q.category = ? " : "") +
-                "GROUP BY q.id " +
-                (numberOfQuestions > 0 ? "HAVING question_count >= ? " : "") +
-                "ORDER BY q.name";
+    public static void updateQuiz(Quiz quiz) {
+        String sql = "UPDATE quizzes SET name = ?, category = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            int paramIndex = 1;
-            pstmt.setString(paramIndex++, "%" + searchTerm + "%");
-            pstmt.setString(paramIndex++, "%" + searchTerm + "%");
-            if (category != null && !category.isEmpty()) {
-                pstmt.setString(paramIndex++, category);
-            }
-            if (numberOfQuestions > 0) {
-                pstmt.setInt(paramIndex, numberOfQuestions);
-            }
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                Quiz quiz = new Quiz();
-                quiz.setId(rs.getString("id"));
-                quiz.setName(rs.getString("name"));
-                quiz.setCategory(rs.getString("category"));
-                quiz.setQuestions(getQuestionsForQuiz(quiz.getId()));
-                quizzes.add(quiz);
-            }
+            pstmt.setString(1, quiz.getName());
+            pstmt.setString(2, quiz.getCategory());
+            pstmt.setString(3, quiz.getId());
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return quizzes;
+    }
+
+    public static void deleteQuiz(String quizId) {
+        String deleteQuizSql = "DELETE FROM quizzes WHERE id = ?";
+        String deleteQuestionsSql = "DELETE FROM questions WHERE quiz_id = ?";
+        String deleteAnswersSql = "DELETE FROM answers WHERE question_id IN (SELECT id FROM questions WHERE quiz_id = ?)";
+        String updateQuizNumbersSql = "UPDATE quizzes SET quiz_number = quiz_number - 1 WHERE quiz_number > ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            conn.setAutoCommit(false);
+
+            int deletedQuizNumber = 0;
+
+            // Get the quiz number of the quiz to be deleted
+            String getQuizNumberSql = "SELECT quiz_number FROM quizzes WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(getQuizNumberSql)) {
+                pstmt.setString(1, quizId);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    deletedQuizNumber = rs.getInt("quiz_number");
+                }
+            }
+
+            // Delete answers
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteAnswersSql)) {
+                pstmt.setString(1, quizId);
+                pstmt.executeUpdate();
+            }
+
+            // Delete questions
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteQuestionsSql)) {
+                pstmt.setString(1, quizId);
+                pstmt.executeUpdate();
+            }
+
+            // Delete quiz
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteQuizSql)) {
+                pstmt.setString(1, quizId);
+                pstmt.executeUpdate();
+            }
+
+            // Update quiz numbers for remaining quizzes
+            if (deletedQuizNumber > 0) {
+                try (PreparedStatement pstmt = conn.prepareStatement(updateQuizNumbersSql)) {
+                    pstmt.setInt(1, deletedQuizNumber);
+                    pstmt.executeUpdate();
+                }
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -6,10 +6,9 @@ import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.scene.layout.VBox;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class AddQuestionController {
 
@@ -24,12 +23,6 @@ public class AddQuestionController {
     public void initialize() {
         questionTypeComboBox.setItems(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
         questionTypeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updateAnswersBox(newVal));
-
-        correctAnswerComboBox.setItems(FXCollections.observableArrayList(
-                IntStream.rangeClosed(1, 4)
-                        .mapToObj(i -> "Answer " + i)
-                        .collect(Collectors.toList())
-        ));
     }
 
     public void setQuiz(Quiz quiz) {
@@ -44,12 +37,33 @@ public class AddQuestionController {
                 answerField.setPromptText("Answer " + i);
                 answersBox.getChildren().add(answerField);
             }
+            correctAnswerComboBox = new ComboBox<>();
+            correctAnswerComboBox.setPromptText("Select correct answer");
             answersBox.getChildren().add(correctAnswerComboBox);
+
+            // Update correct answer options when answer fields change
+            for (int i = 0; i < 4; i++) {
+                final int index = i;
+                TextField field = (TextField) answersBox.getChildren().get(i);
+                field.textProperty().addListener((obs, oldVal, newVal) -> updateCorrectAnswerOptions());
+            }
         } else {
             TextField answerField = new TextField();
             answerField.setPromptText("Correct Answer");
             answersBox.getChildren().add(answerField);
         }
+    }
+
+    private void updateCorrectAnswerOptions() {
+        List<String> options = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            TextField field = (TextField) answersBox.getChildren().get(i);
+            String text = field.getText().trim();
+            if (!text.isEmpty()) {
+                options.add("Answer " + (i + 1));
+            }
+        }
+        correctAnswerComboBox.setItems(FXCollections.observableArrayList(options));
     }
 
     @FXML
@@ -63,12 +77,26 @@ public class AddQuestionController {
             answers = answersBox.getChildren().stream()
                     .filter(node -> node instanceof TextField)
                     .map(node -> ((TextField) node).getText())
+                    .filter(text -> !text.trim().isEmpty())
                     .collect(Collectors.toList());
-            correctAnswer = answers.get(Integer.parseInt(correctAnswerComboBox.getValue().split(" ")[1]) - 1);
+            String selectedAnswer = correctAnswerComboBox.getValue();
+            if (selectedAnswer != null) {
+                int correctAnswerIndex = Integer.parseInt(selectedAnswer.split(" ")[1]) - 1;
+                correctAnswer = answers.get(correctAnswerIndex);
+            } else {
+                // Handle the case where no correct answer is selected
+                showAlert("Error", "Please select a correct answer.");
+                return;
+            }
         } else {
             TextField answerField = (TextField) answersBox.getChildren().get(0);
             correctAnswer = answerField.getText();
             answers = List.of(correctAnswer);
+        }
+
+        if (answers.isEmpty()) {
+            showAlert("Error", "Please provide at least one answer.");
+            return;
         }
 
         Question newQuestion = new Question(questionText, answers, correctAnswer, questionType);
@@ -76,5 +104,13 @@ public class AddQuestionController {
 
         Stage stage = (Stage) questionField.getScene().getWindow();
         stage.close();
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

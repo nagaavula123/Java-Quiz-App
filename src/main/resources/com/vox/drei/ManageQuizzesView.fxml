@@ -12,6 +12,7 @@
     <Label text="Manage Quizzes" styleClass="title"/>
     <TableView fx:id="quizzesTable" VBox.vgrow="ALWAYS">
         <columns>
+            <TableColumn fx:id="numberColumn" text="#" prefWidth="50"/>
             <TableColumn fx:id="nameColumn" text="Quiz Name" prefWidth="200"/>
             <TableColumn fx:id="categoryColumn" text="Category" prefWidth="150"/>
             <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="300"/>

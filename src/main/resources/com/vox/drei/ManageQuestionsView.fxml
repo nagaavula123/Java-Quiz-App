@@ -12,9 +12,10 @@
     <Label text="Manage Questions" styleClass="title"/>
     <TableView fx:id="questionsTable" VBox.vgrow="ALWAYS">
         <columns>
+            <TableColumn fx:id="numberColumn" text="#" prefWidth="50"/>
             <TableColumn fx:id="questionColumn" text="Question" prefWidth="400"/>
             <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
-            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="200"/>
+            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
         </columns>
     </TableView>
     <HBox spacing="10" alignment="CENTER">

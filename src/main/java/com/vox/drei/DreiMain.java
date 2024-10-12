@@ -22,8 +22,8 @@ import java.util.prefs.Preferences;
 public class DreiMain extends Application {
 
     private static Stage primaryStage;
-    private static final double DEFAULT_WIDTH = 900;
-    private static final double DEFAULT_HEIGHT = 600;
+    private static final double DEFAULT_WIDTH = 1200;
+    private static final double DEFAULT_HEIGHT = 800;
     private static StackPane root;
     private static Canvas backgroundCanvas;
     private static List<Particle> particles;
