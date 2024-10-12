@@ -1,5 +1,7 @@
 package com.vox.drei;
 
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -24,9 +26,12 @@ public class ManageQuestionsController {
     @FXML private TableColumn<Question, String> questionColumn;
     @FXML private TableColumn<Question, String> typeColumn;
     @FXML private TableColumn<Question, Void> actionsColumn;
+    @FXML private TextField searchField;
 
     private Quiz currentQuiz;
     private List<Question> questions;
+    private ObservableList<Question> observableQuestions;
+    private FilteredList<Question> filteredQuestions;
 
     public void setQuiz(Quiz quiz) {
         this.currentQuiz = quiz;
@@ -35,7 +40,9 @@ public class ManageQuestionsController {
 
     private void loadQuestions() {
         questions = QuestionDatabase.getQuestionsForQuiz(currentQuiz.getId());
-        questionsTable.setItems(FXCollections.observableArrayList(questions));
+        observableQuestions = FXCollections.observableArrayList(questions);
+        filteredQuestions = new FilteredList<>(observableQuestions, p -> true);
+        questionsTable.setItems(filteredQuestions);
     }
 
     @FXML
@@ -49,6 +56,27 @@ public class ManageQuestionsController {
         actionsColumn.setMaxWidth(1f * Integer.MAX_VALUE * 20);
 
         VBox.setVgrow(questionsTable, Priority.ALWAYS);
+
+        setupSearch();
+    }
+
+    private void setupSearch() {
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredQuestions.setPredicate(question -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (question.getQuestion().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (question.getType().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                return false;
+            });
+        });
     }
 
     private void setupTable() {

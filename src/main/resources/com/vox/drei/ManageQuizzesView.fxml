@@ -10,6 +10,10 @@
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
     <Label text="Manage Quizzes" styleClass="title"/>
+    <HBox spacing="10" alignment="CENTER">
+        <Label text="Search Quizzes:"/>
+        <TextField fx:id="searchField" promptText="Enter quiz name or description"/>
+    </HBox>
     <TableView fx:id="quizzesTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="numberColumn" text="#" prefWidth="50"/>

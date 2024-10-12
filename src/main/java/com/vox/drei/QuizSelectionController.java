@@ -1,5 +1,7 @@
 package com.vox.drei;
 
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
@@ -14,8 +16,11 @@ public class QuizSelectionController {
     @FXML private TableColumn<Quiz, String> nameColumn;
     @FXML private TableColumn<Quiz, String> categoryColumn;
     @FXML private TableColumn<Quiz, Integer> questionCountColumn;
+    @FXML private TextField searchField;
 
     private List<Quiz> quizzes;
+    private ObservableList<Quiz> observableQuizzes;
+    private FilteredList<Quiz> filteredQuizzes;
 
     @FXML
     public void initialize() {
@@ -24,19 +29,41 @@ public class QuizSelectionController {
 
         quizTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Set column widths
-        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
-        categoryColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30); // 30% width
-        questionCountColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40); // 40% width
+        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
+        categoryColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
+        questionCountColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40);
 
-        // Set grow priority
         VBox.setVgrow(quizTableView, Priority.ALWAYS);
+
+        setupSearch();
+    }
+
+    private void setupSearch() {
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredQuizzes.setPredicate(quiz -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (quiz.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (quiz.getCategory().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                return false;
+            });
+        });
     }
 
     private void loadQuizzes() {
         quizzes = QuestionDatabase.loadQuizzes();
-        quizTableView.setItems(FXCollections.observableArrayList(quizzes));
+        observableQuizzes = FXCollections.observableArrayList(quizzes);
+        filteredQuizzes = new FilteredList<>(observableQuizzes, p -> true);
+        quizTableView.setItems(filteredQuizzes);
     }
+
 
     private void setupTable() {
         nameColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getName()));
