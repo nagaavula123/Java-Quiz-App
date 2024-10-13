@@ -4,24 +4,19 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
-import javafx.stage.Stage;
-import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class ManageQuestionsController {
-    @FXML private VBox rootVBox;
     @FXML private TableView<Question> questionsTable;
     @FXML private TableColumn<Question, Integer> numberColumn;
     @FXML private TableColumn<Question, String> questionColumn;

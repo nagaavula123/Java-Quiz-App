@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class ManageQuizzesController {
-    @FXML private VBox rootVBox;
     @FXML private TableView<Quiz> quizzesTable;
     @FXML private TableColumn<Quiz, Integer> numberColumn;
     @FXML private TableColumn<Quiz, String> nameColumn;

@@ -44,8 +44,4 @@ public class Question {
     public boolean isCorrectAnswer(String answer) {
         return answer.equals(correctAnswer);
     }
-
-    public int getCorrectAnswerIndex() {
-        return answers.indexOf(correctAnswer);
-    }
 }

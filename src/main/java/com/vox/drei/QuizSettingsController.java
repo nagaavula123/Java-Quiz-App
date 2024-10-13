@@ -15,7 +15,7 @@ public class QuizSettingsController {
     @FXML private CheckBox animationEnabledCheckBox;
     @FXML private CheckBox immediateAnswerCheckBox; // New checkbox for immediate answer feature
 
-    private Preferences prefs = Preferences.userNodeForPackage(QuizSettingsController.class);
+    private final Preferences prefs = Preferences.userNodeForPackage(QuizSettingsController.class);
 
     @FXML
     public void initialize() {

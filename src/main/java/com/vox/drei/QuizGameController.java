@@ -275,27 +275,6 @@ public class QuizGameController {
         }
     }
 
-
-    private boolean isAnswerSelected() {
-        Question currentQuestion = questions.get(currentQuestionIndex);
-        if (currentQuestion.getType().equals("MULTIPLE_CHOICE")) {
-            ToggleGroup group = ((RadioButton) answerGrid.getChildren().get(0)).getToggleGroup();
-            return group.getSelectedToggle() != null;
-        } else if (currentQuestion.getType().equals("IDENTIFICATION")) {
-            TextField answerField = (TextField) answerGrid.getChildren().get(0);
-            return !answerField.getText().trim().isEmpty();
-        }
-        return false;
-    }
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.show();
-    }
-
     private void checkAnswer() {
         if (answerSubmitted) {
             return;

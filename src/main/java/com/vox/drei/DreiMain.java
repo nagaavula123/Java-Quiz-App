@@ -16,6 +16,7 @@ import javafx.scene.image.Image;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.prefs.Preferences;
 
@@ -27,8 +28,8 @@ public class DreiMain extends Application {
     private static StackPane root;
     private static Canvas backgroundCanvas;
     private static List<Particle> particles;
-    private static Random random = new Random();
-    private static Preferences prefs = Preferences.userNodeForPackage(DreiMain.class);
+    private static final Random random = new Random();
+    private static final Preferences prefs = Preferences.userNodeForPackage(DreiMain.class);
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -42,7 +43,7 @@ public class DreiMain extends Application {
         primaryStage.setTitle("Quiz App");
 
         // Set application icon
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icon.png")));
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png"))));
 
         initializeParticles();
         startBackgroundAnimation();
