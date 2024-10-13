@@ -5,7 +5,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class ScoreController {
     @FXML private VBox rootVBox;
@@ -18,9 +21,12 @@ public class ScoreController {
 
     private List<Question> questions;
     private String quizName;
+    private ResourceBundle bundle;
 
     @FXML
     public void initialize() {
+        bundle = DreiMain.getBundle();
+        ResourceBundle bundle = ResourceBundle.getBundle("messages", Locale.getDefault());
         answersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         questionColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40);
@@ -31,8 +37,11 @@ public class ScoreController {
     }
 
     public void setScore(int score, int totalQuestions) {
-        scoreLabel.setText(String.format("Your Score: %d out of %d", score, totalQuestions));
+        // Use MessageFormat to replace {0} and {1} with score and totalQuestions
+        String formattedScore = MessageFormat.format(bundle.getString("your.score"), score, totalQuestions);
+        scoreLabel.setText(formattedScore);  // Assuming scoreLabel is a Label
     }
+
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
@@ -41,7 +50,7 @@ public class ScoreController {
 
     public void setQuizName(String quizName) {
         this.quizName = quizName;
-        quizNameLabel.setText("Quiz: " + quizName);
+        quizNameLabel.setText(bundle.getString("quiz") + ": " + quizName);
     }
 
     private void populateAnswersTable() {

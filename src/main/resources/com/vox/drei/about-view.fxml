@@ -7,7 +7,6 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.shape.SVGPath?>
-<?import javafx.scene.web.WebView?>
 
 <ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.AboutController"
             fitToWidth="true" fitToHeight="true" stylesheets="@styles.css">
@@ -23,9 +22,9 @@
             </effect>
         </ImageView>
 
-        <Label text="Quiz App" styleClass="about-title"/>
+        <Label text="%app.title" styleClass="about-title"/>
         <Label fx:id="versionLabel" styleClass="about-subtitle"/>
-        <Label text="Created by: drei" styleClass="about-subtitle"/>
+        <Label text="%createdbydrei" styleClass="about-subtitle"/>
 
         <Label fx:id="descriptionLabel" wrapText="true" alignment="CENTER" maxWidth="600" styleClass="about-description"/>
 
@@ -52,7 +51,7 @@
             </Button>
         </HBox>
 
-        <Label text="© 2024 Izel. All rights reserved." styleClass="about-copyright"/>
-        <Button text="Back to Main Menu" onAction="#backToMain" styleClass="about-button"/>
+        <Label text="%copyrightdrei" styleClass="about-copyright"/>
+        <Button text="%back.to.main" onAction="#backToMain" styleClass="about-button"/>
     </VBox>
 </ScrollPane>

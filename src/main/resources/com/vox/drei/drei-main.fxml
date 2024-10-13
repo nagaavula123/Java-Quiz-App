@@ -19,11 +19,11 @@
                 <DropShadow/>
             </effect>
         </ImageView>
-        <Label text="Quiz App" styleClass="title"/>
-        <Button text="Start Quiz" onAction="#startQuiz" styleClass="menu-button"/>
-        <Button text="Manage Quizzes" onAction="#manageQuizzes" styleClass="menu-button"/>
-        <Button text="Quiz Settings" onAction="#openSettings" styleClass="menu-button"/>
-        <Button text="About" onAction="#openAbout" styleClass="menu-button"/>
-        <Button text="Exit" onAction="#exitGame" styleClass="menu-button"/>
+        <Label text="%title" styleClass="title"/>
+        <Button text="%start.quiz" onAction="#startQuiz" styleClass="menu-button"/>
+        <Button text="%manage.quizzes" onAction="#manageQuizzes" styleClass="menu-button"/>
+        <Button text="%quiz.settings" onAction="#openSettings" styleClass="menu-button"/>
+        <Button text="%about" onAction="#openAbout" styleClass="menu-button"/>
+        <Button text="%exit" onAction="#exitGame" styleClass="menu-button"/>
     </VBox>
 </StackPane>

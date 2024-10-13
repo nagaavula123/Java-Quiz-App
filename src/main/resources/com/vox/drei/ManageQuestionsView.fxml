@@ -9,21 +9,21 @@
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
-    <Label text="Manage Questions" styleClass="title"/>
+    <Label text="%manage.questions" styleClass="title"/>
     <HBox spacing="10" alignment="CENTER">
-        <Label text="Search Questions:"/>
-        <TextField fx:id="searchField" promptText="Enter quiz name or description"/>
+        <Label text="%search.questions"/>
+        <TextField fx:id="searchField" promptText="%search.field2"/>
     </HBox>
     <TableView fx:id="questionsTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="numberColumn" text="#" prefWidth="50"/>
-            <TableColumn fx:id="questionColumn" text="Question" prefWidth="400"/>
-            <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
-            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
+            <TableColumn fx:id="questionColumn" text="%question" prefWidth="400"/>
+            <TableColumn fx:id="typeColumn" text="%type" prefWidth="100"/>
+            <TableColumn fx:id="actionsColumn" text="%actions" prefWidth="150"/>
         </columns>
     </TableView>
     <HBox spacing="10" alignment="CENTER">
-        <Button text="Add New Question" onAction="#addNewQuestion"/>
-        <Button text="Back to Manage Quizzes" onAction="#backToManageQuizzes"/>
+        <Button text="%add.new.question" onAction="#addNewQuestion"/>
+        <Button text="%back.to.manage.quizzes" onAction="#backToManageQuizzes"/>
     </HBox>
 </VBox>

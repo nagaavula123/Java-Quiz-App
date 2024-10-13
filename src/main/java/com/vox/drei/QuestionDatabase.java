@@ -4,9 +4,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class QuestionDatabase {
     private static final String DB_URL = "jdbc:sqlite:quiz_app.db";
+    private static final Logger logger = Logger.getLogger(QuestionDatabase.class.getName());
 
     static {
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -22,7 +25,6 @@ public class QuestionDatabase {
                 // Column might already exist, ignore
             }
 
-            // Add question_number column if it doesn't exist
             try {
                 stmt.execute("ALTER TABLE questions ADD COLUMN question_number INTEGER");
             } catch (SQLException e) {
@@ -43,7 +45,8 @@ public class QuestionDatabase {
             pstmt.setString(4, quiz.getCategory());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error adding quiz to database", e);
+            throw new RuntimeException("Failed to add quiz to database", e);
         }
     }
 

@@ -9,17 +9,17 @@
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
-    <Label text="Quiz Completed!" styleClass="title"/>
+    <Label text="%quiz.completed" styleClass="title"/>
     <Label fx:id="quizNameLabel" styleClass="subtitle"/>
     <Label fx:id="scoreLabel" styleClass="score-label"/>
-    <Button text="View Answers" onAction="#viewAnswers"/>
-    <Button text="Back to Main Menu" onAction="#backToMain"/>
+    <Button text="%view.answers" onAction="#viewAnswers"/>
+    <Button text="%back.to.main" onAction="#backToMain"/>
 
     <TableView fx:id="answersTable" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="questionColumn" text="Question"/>
-            <TableColumn fx:id="userAnswerColumn" text="Your Answer"/>
-            <TableColumn fx:id="correctAnswerColumn" text="Correct Answer"/>
+            <TableColumn fx:id="questionColumn" text="%question"/>
+            <TableColumn fx:id="userAnswerColumn" text="%your.answer"/>
+            <TableColumn fx:id="correctAnswerColumn" text="%correct.answer"/>
         </columns>
     </TableView>
 </VBox>

@@ -14,6 +14,7 @@ import javafx.geometry.Insets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class ManageQuestionsController {
@@ -27,9 +28,11 @@ public class ManageQuestionsController {
     private Quiz currentQuiz;
     private ObservableList<Question> observableQuestions;
     private FilteredList<Question> filteredQuestions;
+    private ResourceBundle bundle;
 
     @FXML
     public void initialize() {
+        bundle = DreiMain.getBundle();
         setupTable();
         questionsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -40,13 +43,14 @@ public class ManageQuestionsController {
 
         VBox.setVgrow(questionsTable, Priority.ALWAYS);
 
-        // Initialize with an empty list
         observableQuestions = FXCollections.observableArrayList();
         filteredQuestions = new FilteredList<>(observableQuestions, p -> true);
         questionsTable.setItems(filteredQuestions);
 
         setupSearch();
         setupSorting();
+
+        searchField.setPromptText(bundle.getString("search.questions.prompt"));
     }
 
     public void setQuiz(Quiz quiz) {
@@ -87,12 +91,23 @@ public class ManageQuestionsController {
     private void setupTable() {
         numberColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getQuestionNumber()).asObject());
         questionColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getQuestion()));
-        typeColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getType()));
+        typeColumn.setCellValueFactory(cellData -> {
+            Question question = cellData.getValue();
+            return new javafx.beans.property.SimpleStringProperty(
+                    question.getType().equals("MULTIPLE_CHOICE") ?
+                            bundle.getString("multiple.choice") :
+                            bundle.getString("identification")
+            );
+        });
 
-        // Setup for actions column
+        numberColumn.setText(bundle.getString("number.column"));
+        questionColumn.setText(bundle.getString("question.column"));
+        typeColumn.setText(bundle.getString("type.column"));
+        actionsColumn.setText(bundle.getString("actions.column"));
+
         actionsColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button editButton = new Button("Edit");
-            private final Button deleteButton = new Button("Delete");
+            private final Button editButton = new Button(bundle.getString("edit.button"));
+            private final Button deleteButton = new Button(bundle.getString("delete.button"));
             private final HBox buttonsBox = new HBox(5, editButton, deleteButton);
 
             {
@@ -115,10 +130,10 @@ public class ManageQuestionsController {
 
     private void editQuestion(Question question) {
         Dialog<Question> dialog = new Dialog<>();
-        dialog.setTitle("Edit Question");
-        dialog.setHeaderText("Edit the question details");
+        dialog.setTitle(bundle.getString("edit.question.title"));
+        dialog.setHeaderText(bundle.getString("edit.question.header"));
 
-        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType saveButtonType = new ButtonType(bundle.getString("save.button"), ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
 
         ScrollPane scrollPane = new ScrollPane();
@@ -126,22 +141,25 @@ public class ManageQuestionsController {
         content.setPadding(new Insets(20, 150, 10, 10));
 
         TextField questionField = new TextField(question.getQuestion());
-        questionField.setPromptText("Question");
-        ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
-        typeComboBox.setValue(question.getType());
+        questionField.setPromptText(bundle.getString("question.prompt"));
+        ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList(
+                bundle.getString("multiple.choice"),
+                bundle.getString("identification")
+        ));
+        typeComboBox.setValue(question.getType().equals("MULTIPLE_CHOICE") ? bundle.getString("multiple.choice") : bundle.getString("identification"));
         VBox answersBox = new VBox(5);
 
         content.getChildren().addAll(
-                new Label("Question:"),
+                new Label(bundle.getString("question.label")),
                 questionField,
-                new Label("Type:"),
+                new Label(bundle.getString("type.label")),
                 typeComboBox,
-                new Label("Answers:"),
+                new Label(bundle.getString("answers.label")),
                 answersBox
         );
 
         typeComboBox.setOnAction(e -> updateAnswersBox(answersBox, typeComboBox.getValue(), question));
-        updateAnswersBox(answersBox, question.getType(), question);
+        updateAnswersBox(answersBox, typeComboBox.getValue(), question);
 
         scrollPane.setContent(content);
         scrollPane.setFitToWidth(true);
@@ -158,7 +176,7 @@ public class ManageQuestionsController {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
                 question.setQuestion(questionField.getText());
-                question.setType(typeComboBox.getValue());
+                question.setType(typeComboBox.getValue().equals(bundle.getString("multiple.choice")) ? "MULTIPLE_CHOICE" : "IDENTIFICATION");
 
                 if (question.getType().equals("MULTIPLE_CHOICE")) {
                     List<String> answers = answersBox.getChildren().stream()
@@ -190,13 +208,13 @@ public class ManageQuestionsController {
 
     private void updateAnswersBox(VBox answersBox, String type, Question question) {
         answersBox.getChildren().clear();
-        if (type.equals("MULTIPLE_CHOICE")) {
+        if (type.equals(bundle.getString("multiple.choice"))) {
             ComboBox<String> correctAnswerComboBox = new ComboBox<>();
-            correctAnswerComboBox.setPromptText("Select correct answer");
+            correctAnswerComboBox.setPromptText(bundle.getString("select.correct.answer"));
 
             for (int i = 0; i < 4; i++) {
                 TextField answerField = new TextField();
-                answerField.setPromptText("Answer " + (i + 1));
+                answerField.setPromptText(bundle.getString("answer.prompt") + " " + (i + 1));
                 if (question != null && i < question.getAnswers().size()) {
                     answerField.setText(question.getAnswers().get(i));
                 }
@@ -218,7 +236,7 @@ public class ManageQuestionsController {
 
             if (question != null) {
                 int correctAnswerIndex = question.getAnswers().indexOf(question.getCorrectAnswer()) + 1;
-                correctAnswerComboBox.setValue("Answer " + correctAnswerIndex);
+                correctAnswerComboBox.setValue(bundle.getString("answer.prompt") + " " + correctAnswerIndex);
             }
 
             correctAnswerComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -230,7 +248,7 @@ public class ManageQuestionsController {
             });
         } else {
             TextField answerField = new TextField();
-            answerField.setPromptText("Correct Answer");
+            answerField.setPromptText(bundle.getString("correct.answer.prompt"));
             if (question != null && !question.getAnswers().isEmpty()) {
                 answerField.setText(question.getCorrectAnswer());
             }
@@ -252,7 +270,7 @@ public class ManageQuestionsController {
             TextField field = (TextField) answersBox.getChildren().get(i);
             String text = field.getText().trim();
             if (!text.isEmpty()) {
-                options.add("Answer " + (i + 1));
+                options.add(bundle.getString("answer.prompt") + " " + (i + 1));
             }
         }
         correctAnswerComboBox.setItems(FXCollections.observableArrayList(options));
@@ -261,7 +279,7 @@ public class ManageQuestionsController {
     private void validateEditForm(Button saveButton, TextField questionField, VBox answersBox, ComboBox<String> typeComboBox) {
         boolean isValid = !questionField.getText().trim().isEmpty();
 
-        if ("MULTIPLE_CHOICE".equals(typeComboBox.getValue())) {
+        if (bundle.getString("multiple.choice").equals(typeComboBox.getValue())) {
             int nonEmptyAnswers = (int) answersBox.getChildren().stream()
                     .filter(node -> node instanceof TextField)
                     .map(node -> ((TextField) node).getText().trim())
@@ -280,10 +298,10 @@ public class ManageQuestionsController {
     @FXML
     private void addNewQuestion() {
         Dialog<Question> dialog = new Dialog<>();
-        dialog.setTitle("Add New Question");
-        dialog.setHeaderText("Enter the new question details");
+        dialog.setTitle(bundle.getString("add.new.question.title"));
+        dialog.setHeaderText(bundle.getString("add.new.question.header"));
 
-        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType saveButtonType = new ButtonType(bundle.getString("save.button"), ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
 
         ScrollPane scrollPane = new ScrollPane();
@@ -294,18 +312,21 @@ public class ManageQuestionsController {
         content.setPadding(new Insets(20, 20, 10, 20));
 
         TextField questionField = new TextField();
-        questionField.setPromptText("Enter your question");
+        questionField.setPromptText(bundle.getString("enter.question.prompt"));
 
-        ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
-        typeComboBox.setPromptText("Select question type");
+        ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList(
+                bundle.getString("multiple.choice"),
+                bundle.getString("identification")
+        ));
+        typeComboBox.setPromptText(bundle.getString("select.question.type"));
 
         VBox answersBox = new VBox(5);
-        Label answersLabel = new Label("Answers:");
+        Label answersLabel = new  Label(bundle.getString("answers.label"));
 
         content.getChildren().addAll(
-                new Label("Question:"),
+                new Label(bundle.getString("question.label")),
                 questionField,
-                new Label("Type:"),
+                new Label(bundle.getString("type.label")),
                 typeComboBox,
                 answersLabel,
                 answersBox
@@ -319,14 +340,13 @@ public class ManageQuestionsController {
         Button saveButton = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
         saveButton.setDisable(true);
 
-        questionField.textProperty().addListener((observable, oldValue, newValue) -> {
-            validateEditForm(saveButton, questionField, answersBox, typeComboBox);
-        });
+        questionField.textProperty().addListener((observable, oldValue, newValue) ->
+                validateEditForm(saveButton, questionField, answersBox, typeComboBox));
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
                 String questionText = questionField.getText();
-                String type = typeComboBox.getValue();
+                String type = typeComboBox.getValue().equals(bundle.getString("multiple.choice")) ? "MULTIPLE_CHOICE" : "IDENTIFICATION";
                 List<String> answers;
                 String correctAnswer;
 
@@ -359,9 +379,9 @@ public class ManageQuestionsController {
 
     private void deleteQuestion(Question question) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Delete Question");
-        alert.setHeaderText("Are you sure you want to delete this question?");
-        alert.setContentText("This action cannot be undone.");
+        alert.setTitle(bundle.getString("delete.question.title"));
+        alert.setHeaderText(bundle.getString("delete.question.header"));
+        alert.setContentText(bundle.getString("delete.question.content"));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -370,8 +390,6 @@ public class ManageQuestionsController {
             loadQuestions();
         }
     }
-
-
 
     @FXML
     private void backToManageQuizzes() throws Exception {

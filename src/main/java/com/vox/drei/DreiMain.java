@@ -14,14 +14,14 @@ import javafx.scene.paint.Color;
 import javafx.animation.AnimationTimer;
 import javafx.scene.image.Image;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 public class DreiMain extends Application {
 
+    private static final Logger LOGGER = Logger.getLogger(DreiMain.class.getName());
     private static Stage primaryStage;
     private static final double DEFAULT_WIDTH = 1200;
     private static final double DEFAULT_HEIGHT = 800;
@@ -31,19 +31,32 @@ public class DreiMain extends Application {
     private static final Random random = new Random();
     private static final Preferences prefs = Preferences.userNodeForPackage(DreiMain.class);
 
+    private static ResourceBundle bundle;
+    private static Locale currentLocale;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         DreiMain.primaryStage = primaryStage;
+
+        // Initialize locale
+        String savedLanguage = prefs.get("language", "en");
+        currentLocale = new Locale(savedLanguage);
+        updateBundle();
+
         root = new StackPane();
         backgroundCanvas = new Canvas(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         root.getChildren().add(backgroundCanvas);
 
         Scene scene = new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Quiz App");
+        primaryStage.setTitle(bundle.getString("app.title"));
 
         // Set application icon
-        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png"))));
+        try {
+            primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png"))));
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to load application icon", e);
+        }
 
         initializeParticles();
         startBackgroundAnimation();
@@ -52,8 +65,27 @@ public class DreiMain extends Application {
         primaryStage.show();
     }
 
+    public static void setLanguage(String languageCode) {
+        currentLocale = new Locale(languageCode);
+        updateBundle();
+        prefs.put("language", languageCode);
+    }
+
+    private static void updateBundle() {
+        try {
+            bundle = ResourceBundle.getBundle("messages", currentLocale);
+        } catch (MissingResourceException e) {
+            LOGGER.log(Level.SEVERE, "Failed to load resource bundle for locale: " + currentLocale, e);
+            bundle = ResourceBundle.getBundle("messages", Locale.getDefault());
+        }
+    }
+
+    public static ResourceBundle getBundle() {
+        return bundle;
+    }
+
     public static void showScoreView(int score, int totalQuestions, List<Question> questions, String quizName) throws Exception {
-        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("ScoreView.fxml"));
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("ScoreView.fxml"), bundle);
         Parent scoreView = loader.load();
         ScoreController controller = loader.getController();
         controller.setScore(score, totalQuestions);
@@ -70,7 +102,7 @@ public class DreiMain extends Application {
     }
 
     public static void showAboutView() throws Exception {
-        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("about-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("about-view.fxml"), bundle);
         Parent aboutView = loader.load();
         setView(aboutView);
     }
@@ -97,25 +129,26 @@ public class DreiMain extends Application {
     }
 
     public static void showMainView() throws Exception {
-        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("drei-main.fxml"));
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("drei-main.fxml"), bundle);
         Parent mainView = loader.load();
         setView(mainView);
+        primaryStage.setTitle(bundle.getString("app.title"));
     }
 
     public static void showQuizSelectionView() throws Exception {
-        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("QuizSelectionView.fxml"));
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("QuizSelectionView.fxml"), bundle);
         Parent quizSelectionView = loader.load();
         setView(quizSelectionView);
     }
 
     public static void showManageQuizzesView() throws Exception {
-        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("ManageQuizzesView.fxml"));
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("ManageQuizzesView.fxml"), bundle);
         Parent manageQuizzesView = loader.load();
         setView(manageQuizzesView);
     }
 
     public static void showManageQuestionsView(Quiz quiz) throws Exception {
-        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("ManageQuestionsView.fxml"));
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("ManageQuestionsView.fxml"), bundle);
         Parent manageQuestionsView = loader.load();
         ManageQuestionsController controller = loader.getController();
         controller.setQuiz(quiz);
@@ -123,13 +156,13 @@ public class DreiMain extends Application {
     }
 
     public static void showQuizGameView() throws Exception {
-        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("QuizGameView.fxml"));
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("QuizGameView.fxml"),  bundle);
         Parent quizGameView = loader.load();
         setView(quizGameView);
     }
 
     public static void showQuizSettingsView() throws Exception {
-        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("QuizSettingsView.fxml"));
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("QuizSettingsView.fxml"), bundle);
         Parent quizSettingsView = loader.load();
         setView(quizSettingsView);
     }

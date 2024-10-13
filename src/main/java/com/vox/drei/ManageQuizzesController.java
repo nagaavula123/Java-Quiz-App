@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class ManageQuizzesController {
     @FXML private TableView<Quiz> quizzesTable;
@@ -26,9 +27,11 @@ public class ManageQuizzesController {
     private List<Quiz> quizzes;
     private ObservableList<Quiz> observableQuizzes;
     private FilteredList<Quiz> filteredQuizzes;
+    private ResourceBundle bundle;
 
     @FXML
     public void initialize() {
+        bundle = DreiMain.getBundle();
         loadQuizzes();
         setupTable();
 
@@ -83,8 +86,8 @@ public class ManageQuizzesController {
         categoryColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getCategory()));
 
         actionsColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button editButton = new Button("Edit");
-            private final Button deleteButton = new Button("Delete");
+            private final Button editButton = new Button(bundle.getString("edit.button"));
+            private final Button deleteButton = new Button(bundle.getString("delete.button"));
             private final Button manageQuestionsButton = new Button("Manage Questions");
 
             {
@@ -118,10 +121,10 @@ public class ManageQuizzesController {
 
     private boolean openEditDialog(Quiz quiz) {
         Dialog<Quiz> dialog = new Dialog<>();
-        dialog.setTitle("Edit Quiz");
-        dialog.setHeaderText("Edit the quiz details");
+        dialog.setTitle(bundle.getString("edit.quiz.title"));
+        dialog.setHeaderText(bundle.getString("edit.quiz.header"));
 
-        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType saveButtonType = new ButtonType(bundle.getString("save.button"), ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
@@ -132,9 +135,9 @@ public class ManageQuizzesController {
         TextField nameField = new TextField(quiz.getName());
         TextField categoryField = new TextField(quiz.getCategory());
 
-        grid.add(new Label("Quiz Name:"), 0, 0);
+        grid.add(new Label(bundle.getString("quiz.name.label")), 0, 0);
         grid.add(nameField, 1, 0);
-        grid.add(new Label("Category:"), 0, 1);
+        grid.add(new Label(bundle.getString("category.label")), 0, 1);
         grid.add(categoryField, 1, 1);
 
         dialog.getDialogPane().setContent(grid);
@@ -155,9 +158,9 @@ public class ManageQuizzesController {
     private void deleteQuiz(int index) {
         Quiz quiz = quizzes.get(index);
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Delete Quiz");
-        alert.setHeaderText("Are you sure you want to delete this quiz?");
-        alert.setContentText("This action cannot be undone.");
+        alert.setTitle(bundle.getString("delete.quiz.title"));
+        alert.setHeaderText(bundle.getString("delete.quiz.header"));
+        alert.setContentText(bundle.getString("delete.quiz.content"));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -172,17 +175,17 @@ public class ManageQuizzesController {
             DreiMain.showManageQuestionsView(quiz);
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to open Manage Questions view.");
+            showAlert(bundle.getString("error.title"), bundle.getString("manage.questions.error"));
         }
     }
 
     @FXML
     private void addNewQuiz() {
         Dialog<Quiz> dialog = new Dialog<>();
-        dialog.setTitle("Add New Quiz");
-        dialog.setHeaderText("Enter the details for the new quiz");
+        dialog.setTitle(bundle.getString("add.new.quiz.title"));
+        dialog.setHeaderText(bundle.getString("add.new.quiz.header"));
 
-        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType saveButtonType = new ButtonType(bundle.getString("save.button"), ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
@@ -193,9 +196,9 @@ public class ManageQuizzesController {
         TextField nameField = new TextField();
         TextField categoryField = new TextField();
 
-        grid.add(new Label("Quiz Name:"), 0, 0);
+        grid.add(new Label(bundle.getString("quiz.name.label")), 0, 0);
         grid.add(nameField, 1, 0);
-        grid.add(new Label("Category:"), 0, 1);
+        grid.add(new Label(bundle.getString("category.label")), 0, 1);
         grid.add(categoryField, 1, 1);
 
         dialog.getDialogPane().setContent(grid);

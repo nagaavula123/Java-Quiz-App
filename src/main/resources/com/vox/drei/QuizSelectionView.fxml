@@ -9,20 +9,20 @@
     <padding>
         <Insets top="40" right="40" bottom="40" left="40"/>
     </padding>
-    <Label text="Select a Quiz" styleClass="title"/>
+    <Label text="%select.quiz" styleClass="title"/>
     <HBox spacing="10" alignment="CENTER">
-        <Label text="Search Quizzes:"/>
-        <TextField fx:id="searchField" promptText="Enter quiz name or description"/>
+        <Label text="%search.quizzes"/>
+        <TextField fx:id="searchField" promptText="%search.field"/>
     </HBox>
     <TableView fx:id="quizTableView" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="nameColumn" text="Quiz Name" prefWidth="200"/>
-            <TableColumn fx:id="categoryColumn" text="Category" prefWidth="150"/>
-            <TableColumn fx:id="questionCountColumn" text="Questions" prefWidth="100"/>
+            <TableColumn fx:id="nameColumn" text="%quiz.name" prefWidth="200"/>
+            <TableColumn fx:id="categoryColumn" text="%category" prefWidth="150"/>
+            <TableColumn fx:id="questionCountColumn" text="%questions" prefWidth="100"/>
         </columns>
     </TableView>
     <HBox spacing="20" alignment="CENTER">
-        <Button text="Start Selected Quiz" onAction="#startSelectedQuiz" styleClass="primary-button"/>
-        <Button text="Back to Main Menu" onAction="#backToMain" styleClass="secondary-button"/>
+        <Button text="%start.selected.quiz" onAction="#startSelectedQuiz" styleClass="primary-button"/>
+        <Button text="%back.to.main" onAction="#backToMain" styleClass="secondary-button"/>
     </HBox>
 </VBox>

@@ -8,6 +8,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class AddQuestionController {
@@ -18,11 +19,17 @@ public class AddQuestionController {
     @FXML private ComboBox<String> questionTypeComboBox;
     @FXML private Button saveButton;
 
+    private ResourceBundle bundle;
     private Quiz currentQuiz;
 
     @FXML
     public void initialize() {
-        questionTypeComboBox.setItems(FXCollections.observableArrayList("MULTIPLE_CHOICE", "IDENTIFICATION"));
+        bundle = DreiMain.getBundle();
+
+        questionTypeComboBox.setItems(FXCollections.observableArrayList(
+                bundle.getString("multiple.choice"),
+                bundle.getString("identification")
+        ));
         questionTypeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updateAnswersBox(newVal));
 
         // Disable save button by default
@@ -31,6 +38,11 @@ public class AddQuestionController {
         // Add listeners to enable/disable save button
         questionField.textProperty().addListener((obs, oldVal, newVal) -> validateForm());
         correctAnswerComboBox.valueProperty().addListener((obs, oldVal, newVal) -> validateForm());
+
+        // Set localized prompts
+        questionField.setPromptText(bundle.getString("enter.question"));
+        questionTypeComboBox.setPromptText(bundle.getString("select.question.type"));
+        saveButton.setText(bundle.getString("save.question"));
     }
 
     public void setQuiz(Quiz quiz) {
@@ -39,24 +51,24 @@ public class AddQuestionController {
 
     private void updateAnswersBox(String questionType) {
         answersBox.getChildren().clear();
-        if ("MULTIPLE_CHOICE".equals(questionType)) {
+        if (questionType.equals(bundle.getString("multiple.choice"))) {
             for (int i = 1; i <= 4; i++) {
                 TextField answerField = new TextField();
-                answerField.setPromptText("Answer " + i);
+                answerField.setPromptText(bundle.getString("answer") + " " + i);
                 answersBox.getChildren().add(answerField);
 
                 // Add listener to update correct answer options
                 answerField.textProperty().addListener((obs, oldVal, newVal) -> updateCorrectAnswerOptions());
             }
             correctAnswerComboBox = new ComboBox<>();
-            correctAnswerComboBox.setPromptText("Select correct answer");
+            correctAnswerComboBox.setPromptText(bundle.getString("select.correct.answer"));
             answersBox.getChildren().add(correctAnswerComboBox);
 
             // Add listener to validate form when correct answer is selected
             correctAnswerComboBox.valueProperty().addListener((obs, oldVal, newVal) -> validateForm());
         } else {
             TextField answerField = new TextField();
-            answerField.setPromptText("Correct Answer");
+            answerField.setPromptText(bundle.getString("correct.answer"));
             answersBox.getChildren().add(answerField);
 
             // Add listener to validate form when answer is entered
@@ -70,7 +82,7 @@ public class AddQuestionController {
             TextField field = (TextField) answersBox.getChildren().get(i);
             String text = field.getText().trim();
             if (!text.isEmpty()) {
-                options.add("Answer " + (i + 1));
+                options.add(bundle.getString("answer") + " " + (i + 1));
             }
         }
         correctAnswerComboBox.setItems(FXCollections.observableArrayList(options));
@@ -80,7 +92,7 @@ public class AddQuestionController {
     private void validateForm() {
         boolean isValid = !questionField.getText().trim().isEmpty();
 
-        if ("MULTIPLE_CHOICE".equals(questionTypeComboBox.getValue())) {
+        if (questionTypeComboBox.getValue().equals(bundle.getString("multiple.choice"))) {
             int nonEmptyAnswers = (int) answersBox.getChildren().stream()
                     .filter(node -> node instanceof TextField)
                     .map(node -> ((TextField) node).getText().trim())
@@ -102,7 +114,7 @@ public class AddQuestionController {
         List<String> answers;
         String correctAnswer;
 
-        if ("MULTIPLE_CHOICE".equals(questionType)) {
+        if (questionType.equals(bundle.getString("multiple.choice"))) {
             answers = answersBox.getChildren().stream()
                     .filter(node -> node instanceof TextField)
                     .map(node -> ((TextField) node).getText())
@@ -114,7 +126,7 @@ public class AddQuestionController {
                 correctAnswer = answers.get(correctAnswerIndex);
             } else {
                 // Handle the case where no correct answer is selected
-                showAlert("Error", "Please select a correct answer.");
+                showAlert(bundle.getString("error"), bundle.getString("select.correct.answer"));
                 return;
             }
         } else {
@@ -124,7 +136,7 @@ public class AddQuestionController {
         }
 
         if (answers.isEmpty()) {
-            showAlert("Error", "Please provide at least one answer.");
+            showAlert(bundle.getString("error"), bundle.getString("provide.answer"));
             return;
         }
 

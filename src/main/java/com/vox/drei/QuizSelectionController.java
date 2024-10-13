@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class QuizSelectionController {
 
@@ -22,9 +23,11 @@ public class QuizSelectionController {
     private List<Quiz> quizzes;
     private ObservableList<Quiz> observableQuizzes;
     private FilteredList<Quiz> filteredQuizzes;
+    private ResourceBundle bundle;
 
     @FXML
     public void initialize() {
+        bundle = DreiMain.getBundle();
         loadQuizzes();
         setupTable();
 
@@ -83,10 +86,14 @@ public class QuizSelectionController {
     private void startSelectedQuiz() throws Exception {
         Quiz selectedQuiz = quizTableView.getSelectionModel().getSelectedItem();
         if (selectedQuiz != null) {
-            QuizGameController.setCurrentQuiz(selectedQuiz);
-            DreiMain.showQuizGameView();
+            if (selectedQuiz.getQuestions().isEmpty()) {
+                showAlert(bundle.getString("error"), bundle.getString("no.questions.error"));
+            } else {
+                QuizGameController.setCurrentQuiz(selectedQuiz);
+                DreiMain.showQuizGameView();
+            }
         } else {
-            showAlert("No Quiz Selected", "Please select a quiz to start.");
+            showAlert(bundle.getString("no.quiz.selected.title"), bundle.getString("no.quiz.selected.content"));
         }
     }
 

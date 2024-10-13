@@ -9,10 +9,10 @@
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
-    <Label text="Add New Question" styleClass="title"/>
-    <TextField fx:id="questionField" promptText="Enter your question"/>
-    <ComboBox fx:id="questionTypeComboBox" promptText="Select question type"/>
+    <Label text="%add.new.question" styleClass="title"/>
+    <TextField fx:id="questionField" promptText="%enter.your.question"/>
+    <ComboBox fx:id="questionTypeComboBox" promptText="%select.question.type"/>
     <VBox fx:id="answersBox" spacing="5"/>
-    <ComboBox fx:id="correctAnswerComboBox" promptText="Select correct answer"/>
-    <Button text="Add Question" onAction="#addQuestion"/>
+    <ComboBox fx:id="correctAnswerComboBox" promptText="%select.correct.answer"/>
+    <Button text="%add.question" onAction="#addQuestion"/>
 </VBox>

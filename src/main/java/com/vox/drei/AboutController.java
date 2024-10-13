@@ -9,6 +9,7 @@ import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
 import java.awt.Desktop;
 import java.net.URI;
+import java.util.ResourceBundle;
 
 public class AboutController {
 
@@ -33,10 +34,13 @@ public class AboutController {
     @FXML
     private Button githubButton;
 
+    private ResourceBundle bundle;
+
     @FXML
     public void initialize() {
-        versionLabel.setText("Version 1.0");
-        descriptionLabel.setText("Welcome to JavaFX Quiz App, a desktop application built with JavaFX in IntelliJ IDEA.");
+        bundle = DreiMain.getBundle();
+        versionLabel.setText(bundle.getString("version.label"));
+        descriptionLabel.setText(bundle.getString("description.label"));
 
         // Add fade-in animation
         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1.5), rootVBox);

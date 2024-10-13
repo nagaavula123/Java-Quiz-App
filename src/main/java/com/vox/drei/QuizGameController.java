@@ -11,6 +11,7 @@ import javafx.util.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class QuizGameController {
@@ -44,12 +45,15 @@ public class QuizGameController {
     private Timeline timer;
     private boolean timerRunning = false;
 
+    private ResourceBundle bundle;
+
     public static void setCurrentQuiz(Quiz quiz) {
         currentQuiz = quiz;
     }
 
     @FXML
     public void initialize() {
+        bundle = DreiMain.getBundle();
         if (currentQuiz == null) {
             // Handle error: No quiz selected
             return;
@@ -108,7 +112,7 @@ public class QuizGameController {
 
     private void showCorrectAnswer() {
         Question currentQuestion = questions.get(currentQuestionIndex);
-        correctAnswerLabel.setText("Correct Answer: " + currentQuestion.getCorrectAnswer());
+        correctAnswerLabel.setText(bundle.getString("correct.answer") + ": " + currentQuestion.getCorrectAnswer());
         correctAnswerLabel.setVisible(true);
     }
 
@@ -132,7 +136,7 @@ public class QuizGameController {
         }
 
         Question currentQuestion = questions.get(currentQuestionIndex);
-        questionNumberLabel.setText("Question " + (currentQuestionIndex + 1) + " of " + questions.size());
+        questionNumberLabel.setText(bundle.getString("question") + " " + (currentQuestionIndex + 1) + " " + bundle.getString("of") + " " + questions.size());
         questionLabel.setText(currentQuestion.getQuestion());
 
         answerGrid.getChildren().clear();
@@ -171,7 +175,7 @@ public class QuizGameController {
 
     private void displayIdentificationQuestion() {
         TextField answerField = new TextField();
-        answerField.setPromptText("Type your answer here");
+        answerField.setPromptText(bundle.getString("type.your.answer"));
         answerField.setStyle("-fx-prompt-text-fill: #808080;"); // Dark gray prompt text
         answerGrid.add(answerField, 0, 0);
     }
@@ -180,7 +184,7 @@ public class QuizGameController {
         remainingTime = java.time.Duration.ofSeconds(prefs.getInt("timePerQuestion", 15));
         timer = new Timeline(
                 new KeyFrame(Duration.ZERO, e -> {
-                    java.time.Duration timeLeft = remainingTime.minus(java.time.Duration.between(startTime, Instant.now()));
+                    java.time.Duration timeLeft = remainingTime.minus(java.time.Duration.between(startTime, Instant.now()).plus(elapsedTime));
                     if (timeLeft.isZero() || timeLeft.isNegative()) {
                         handleTimeUp();
                     } else {
@@ -221,7 +225,7 @@ public class QuizGameController {
         startTime = Instant.now();
         timer.play();
         timerRunning = true;
-        toggleTimerButton.setText("Pause Timer");
+        toggleTimerButton.setText(bundle.getString("pause.timer"));
     }
 
     private void pauseTimer() {
@@ -229,7 +233,7 @@ public class QuizGameController {
             timer.pause();
             elapsedTime = elapsedTime.plus(java.time.Duration.between(startTime, Instant.now()));
             timerRunning = false;
-            toggleTimerButton.setText("Resume Timer");
+            toggleTimerButton.setText(bundle.getString("resume.timer"));
         }
     }
 
@@ -240,7 +244,7 @@ public class QuizGameController {
         }
         timerRunning = false;
         Platform.runLater(() -> {
-            notificationLabel.setText("Time's up! Click 'Next Question' to continue.");
+            notificationLabel.setText(bundle.getString("time.up"));
             notificationLabel.setVisible(true);
             nextQuestionButton.setDisable(false);
             toggleTimerButton.setDisable(true);
@@ -315,9 +319,9 @@ public class QuizGameController {
     @FXML
     private void exitQuiz() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Exit Quiz");
-        alert.setHeaderText("Are you sure you want to exit the quiz?");
-        alert.setContentText("Your progress will be lost.");
+        alert.setTitle(bundle.getString("exit.quiz.title"));
+        alert.setHeaderText(bundle.getString("exit.quiz.header"));
+        alert.setContentText(bundle.getString("exit.quiz.content"));
 
         alert.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
