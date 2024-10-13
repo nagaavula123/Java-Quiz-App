@@ -68,6 +68,12 @@ public class DreiMain extends Application {
         }
     }
 
+    public static void showAboutView() throws Exception {
+        FXMLLoader loader = new FXMLLoader(DreiMain.class.getResource("about-view.fxml"));
+        Parent aboutView = loader.load();
+        setView(aboutView);
+    }
+
     private static void startBackgroundAnimation() {
         GraphicsContext gc = backgroundCanvas.getGraphicsContext2D();
         new AnimationTimer() {

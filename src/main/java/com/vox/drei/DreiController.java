@@ -20,6 +20,11 @@ public class DreiController {
     }
 
     @FXML
+    private void openAbout() throws Exception {
+        DreiMain.showAboutView();
+    }
+
+    @FXML
     private void exitGame() {
         System.exit(0);
     }
