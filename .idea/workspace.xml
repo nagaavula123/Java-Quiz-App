@@ -4,15 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="55fc9eff-590e-4142-ae36-479987bf3475" name="Changes" comment="System Update/Improvement&#10;Finished Immediately Show Correct Answers Feature">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/AboutController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/vox/drei/about-view.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/vox/drei/icon.png" afterDir="false" />
+    <list default="true" id="55fc9eff-590e-4142-ae36-479987bf3475" name="Changes" comment="System Update/Improvement&#10;About me Page">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/DreiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/DreiController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/DreiMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/DreiMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/vox/drei/drei-main.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/vox/drei/drei-main.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vox/drei/QuizGameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vox/drei/QuizGameController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/vox/drei/QuizGameView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/vox/drei/QuizGameView.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/vox/drei/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/vox/drei/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -125,7 +120,7 @@
       <workItem from="1728605491481" duration="20255000" />
       <workItem from="1728702760408" duration="18870000" />
       <workItem from="1728722834874" duration="701000" />
-      <workItem from="1728778705281" duration="4048000" />
+      <workItem from="1728778705281" duration="5974000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Quiz System">
       <option name="closed" value="true" />
@@ -359,7 +354,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728779818061</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="System Update/Improvement&#10;About me Page">
+      <option name="closed" value="true" />
+      <created>1728783014430</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1728783014430</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -381,6 +384,7 @@
     <MESSAGE value="System Update" />
     <MESSAGE value="System Update/Improvement" />
     <MESSAGE value="System Update/Improvement&#10;Finished Immediately Show Correct Answers Feature" />
-    <option name="LAST_COMMIT_MESSAGE" value="System Update/Improvement&#10;Finished Immediately Show Correct Answers Feature" />
+    <MESSAGE value="System Update/Improvement&#10;About me Page" />
+    <option name="LAST_COMMIT_MESSAGE" value="System Update/Improvement&#10;About me Page" />
   </component>
 </project>

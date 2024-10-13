@@ -1,15 +1,13 @@
 package com.vox.drei;
 
-import javafx.animation.AnimationTimer;
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -17,19 +15,20 @@ import java.util.prefs.Preferences;
 
 public class QuizGameController {
 
+    @FXML private Label quizNameLabel;
+    @FXML private ProgressBar quizProgressBar;
+    @FXML private Label questionNumberLabel;
     @FXML private Label questionLabel;
     @FXML private GridPane answerGrid;
+    @FXML private Circle timerCircle;
     @FXML private Label timerLabel;
-    @FXML private Button nextQuestionButton;
-    @FXML private Button submitAnswerButton; // New button for submitting answers
-    @FXML private Button exitQuizButton;
-    @FXML private Button toggleTimerButton;
     @FXML private Label notificationLabel;
     @FXML private Label correctAnswerLabel;
-    @FXML private VBox rootVBox; // Add this field to reference the root layout
-    @FXML
-    private HBox buttonBox;
-
+    @FXML private Button submitAnswerButton;
+    @FXML private Button nextQuestionButton;
+    @FXML private Button toggleTimerButton;
+    @FXML private Button exitQuizButton;
+    @FXML private HBox buttonBox;
 
     private static Quiz currentQuiz;
     private List<Question> questions;
@@ -40,9 +39,9 @@ public class QuizGameController {
     private boolean immediateAnswerEnabled;
 
     private Instant startTime;
-    private Duration elapsedTime = Duration.ZERO;
-    private Duration remainingTime;
-    private AnimationTimer timer;
+    private java.time.Duration elapsedTime = java.time.Duration.ZERO;
+    private java.time.Duration remainingTime;
+    private Timeline timer;
     private boolean timerRunning = false;
 
     public static void setCurrentQuiz(Quiz quiz) {
@@ -56,20 +55,7 @@ public class QuizGameController {
             return;
         }
 
-        // Ensure buttons are initialized before calling updateButtonVisibility
-        if (submitAnswerButton == null || nextQuestionButton == null ||
-                toggleTimerButton == null || exitQuizButton == null) {
-            System.err.println("Error: One or more buttons are not properly initialized.");
-            return;
-        }
-
-        // Initialize the button box if it's not already set in FXML
-        if (buttonBox == null) {
-            buttonBox = new HBox(10); // 10 is the spacing between buttons
-            buttonBox.getChildren().addAll(submitAnswerButton, nextQuestionButton, toggleTimerButton, exitQuizButton);
-            // Add buttonBox to your layout here if necessary
-        }
-
+        quizNameLabel.setText(currentQuiz.getName());
         loadQuestions();
         initializeTimer();
         immediateAnswerEnabled = prefs.getBoolean("immediateAnswerEnabled", false);
@@ -77,6 +63,7 @@ public class QuizGameController {
         displayQuestion();
 
         if (!prefs.getBoolean("timerEnabled", true)) {
+            timerCircle.setVisible(false);
             timerLabel.setVisible(false);
             toggleTimerButton.setVisible(false);
         }
@@ -130,6 +117,12 @@ public class QuizGameController {
         Collections.shuffle(questions);
         int numQuestions = Math.min(prefs.getInt("numQuestions", 5), questions.size());
         questions = questions.subList(0, numQuestions);
+        updateQuizProgress();
+    }
+
+    private void updateQuizProgress() {
+        double progress = (double) (currentQuestionIndex + 1) / questions.size();
+        quizProgressBar.setProgress(progress);
     }
 
     private void displayQuestion() {
@@ -139,6 +132,7 @@ public class QuizGameController {
         }
 
         Question currentQuestion = questions.get(currentQuestionIndex);
+        questionNumberLabel.setText("Question " + (currentQuestionIndex + 1) + " of " + questions.size());
         questionLabel.setText(currentQuestion.getQuestion());
 
         answerGrid.getChildren().clear();
@@ -155,6 +149,13 @@ public class QuizGameController {
         answerSubmitted = false;
         toggleTimerButton.setDisable(false);
         updateButtonVisibility();
+        updateQuizProgress();
+
+        // Add fade-in animation for the question
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5), questionLabel);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
     }
 
     private void displayMultipleChoiceQuestion(Question currentQuestion) {
@@ -176,33 +177,38 @@ public class QuizGameController {
     }
 
     private void initializeTimer() {
-        remainingTime = Duration.ofSeconds(prefs.getInt("timePerQuestion", 15));
-        timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (startTime == null) {
-                    startTime = Instant.now();
-                }
-                Duration currentElapsed = Duration.between(startTime, Instant.now());
-                Duration totalElapsed = elapsedTime.plus(currentElapsed);
-                Duration timeLeft = remainingTime.minus(totalElapsed);
+        remainingTime = java.time.Duration.ofSeconds(prefs.getInt("timePerQuestion", 15));
+        timer = new Timeline(
+                new KeyFrame(Duration.ZERO, e -> {
+                    java.time.Duration timeLeft = remainingTime.minus(java.time.Duration.between(startTime, Instant.now()));
+                    if (timeLeft.isZero() || timeLeft.isNegative()) {
+                        handleTimeUp();
+                    } else {
+                        updateTimerDisplay(timeLeft);
+                    }
+                }),
+                new KeyFrame(Duration.seconds(1))
+        );
+        timer.setCycleCount(Animation.INDEFINITE);
+    }
 
-                if (timeLeft.isZero() || timeLeft.isNegative()) {
-                    handleTimeUp();
-                } else {
-                    updateTimerLabel(timeLeft);
-                }
-            }
-        };
+    private void updateTimerDisplay(java.time.Duration timeLeft) {
+        int seconds = (int) timeLeft.getSeconds();
+        timerLabel.setText(String.format("%02d:%02d", seconds / 60, seconds % 60));
+
+        // Update the timer circle
+        double progress = 1 - (double) seconds / prefs.getInt("timePerQuestion", 15);
+        timerCircle.setStyle(String.format("-fx-fill: linear-gradient(from 0%% 0%% to 0%% 100%%, #003366 %f%%, #FFB300 %f%%);",
+                progress * 100, progress * 100));
     }
 
     private void resetTimer() {
         if (timer != null) {
             timer.stop();
         }
-        remainingTime = Duration.ofSeconds(prefs.getInt("timePerQuestion", 15));
+        remainingTime = java.time.Duration.ofSeconds(prefs.getInt("timePerQuestion", 15));
         startTime = null;
-        elapsedTime = Duration.ZERO;
+        elapsedTime = java.time.Duration.ZERO;
         if (prefs.getBoolean("timerEnabled", true)) {
             startTimer();
         }
@@ -213,23 +219,20 @@ public class QuizGameController {
             initializeTimer();
         }
         startTime = Instant.now();
-        timer.start();
+        timer.play();
         timerRunning = true;
         toggleTimerButton.setText("Pause Timer");
     }
 
     private void pauseTimer() {
         if (timer != null) {
-            timer.stop();
-            elapsedTime = elapsedTime.plus(Duration.between(startTime, Instant.now()));
+            timer.pause();
+            elapsedTime = elapsedTime.plus(java.time.Duration.between(startTime, Instant.now()));
             timerRunning = false;
             toggleTimerButton.setText("Resume Timer");
         }
     }
 
-    private void updateTimerLabel(Duration timeLeft) {
-        Platform.runLater(() -> timerLabel.setText("Time: " + timeLeft.getSeconds()));
-    }
 
     private void handleTimeUp() {
         if (timer != null) {

@@ -2,18 +2,40 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.QuizGameController"
-      spacing="20" alignment="CENTER" stylesheets="@styles.css">
-    <Label fx:id="questionLabel" styleClass="question-label"/>
-    <GridPane fx:id="answerGrid" alignment="CENTER" hgap="10" vgap="10"/>
-    <Label fx:id="timerLabel" styleClass="timer-label"/>
-    <Label fx:id="notificationLabel" styleClass="notification-label"/>
-    <Label fx:id="correctAnswerLabel" styleClass="correct-answer-label"/>
-    <HBox fx:id="buttonBox" spacing="10" alignment="CENTER">
-        <Button fx:id="submitAnswerButton" text="Submit Answer" onAction="#submitAnswer"/>
-        <Button fx:id="nextQuestionButton" text="Next Question" onAction="#nextQuestion"/>
-        <Button fx:id="toggleTimerButton" text="Pause Timer" onAction="#toggleTimer"/>
-        <Button fx:id="exitQuizButton" text="Exit Quiz" onAction="#exitQuiz"/>
-    </HBox>
-</VBox>
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.vox.drei.QuizGameController"
+           stylesheets="@styles.css">
+    <VBox spacing="20" alignment="CENTER" styleClass="quiz-container">
+        <padding>
+            <Insets top="40" right="40" bottom="40" left="40"/>
+        </padding>
+
+        <HBox alignment="CENTER" spacing="20">
+            <Label fx:id="quizNameLabel" styleClass="quiz-name-label"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <ProgressBar fx:id="quizProgressBar" prefWidth="200" progress="0.0" styleClass="quiz-progress-bar"/>
+        </HBox>
+
+        <Label fx:id="questionNumberLabel" styleClass="question-number-label"/>
+        <Label fx:id="questionLabel" styleClass="question-label" wrapText="true"/>
+
+        <GridPane fx:id="answerGrid" alignment="CENTER" hgap="10" vgap="10"/>
+
+        <HBox alignment="CENTER" spacing="20">
+            <Circle fx:id="timerCircle" radius="30" styleClass="timer-circle"/>
+            <Label fx:id="timerLabel" styleClass="timer-label"/>
+        </HBox>
+
+        <Label fx:id="notificationLabel" styleClass="notification-label"/>
+        <Label fx:id="correctAnswerLabel" styleClass="correct-answer-label"/>
+
+        <HBox fx:id="buttonBox" spacing="10" alignment="CENTER">
+            <Button fx:id="submitAnswerButton" text="Submit Answer" onAction="#submitAnswer" styleClass="quiz-button"/>
+            <Button fx:id="nextQuestionButton" text="Next Question" onAction="#nextQuestion" styleClass="quiz-button"/>
+            <Button fx:id="toggleTimerButton" text="Pause Timer" onAction="#toggleTimer" styleClass="quiz-button"/>
+            <Button fx:id="exitQuizButton" text="Exit Quiz" onAction="#exitQuiz" styleClass="quiz-button"/>
+        </HBox>
+    </VBox>
+</StackPane>
