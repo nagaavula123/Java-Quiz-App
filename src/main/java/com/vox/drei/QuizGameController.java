@@ -5,6 +5,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -23,6 +26,10 @@ public class QuizGameController {
     @FXML private Button toggleTimerButton;
     @FXML private Label notificationLabel;
     @FXML private Label correctAnswerLabel;
+    @FXML private VBox rootVBox; // Add this field to reference the root layout
+    @FXML
+    private HBox buttonBox;
+
 
     private static Quiz currentQuiz;
     private List<Question> questions;
@@ -48,11 +55,27 @@ public class QuizGameController {
             // Handle error: No quiz selected
             return;
         }
+
+        // Ensure buttons are initialized before calling updateButtonVisibility
+        if (submitAnswerButton == null || nextQuestionButton == null ||
+                toggleTimerButton == null || exitQuizButton == null) {
+            System.err.println("Error: One or more buttons are not properly initialized.");
+            return;
+        }
+
+        // Initialize the button box if it's not already set in FXML
+        if (buttonBox == null) {
+            buttonBox = new HBox(10); // 10 is the spacing between buttons
+            buttonBox.getChildren().addAll(submitAnswerButton, nextQuestionButton, toggleTimerButton, exitQuizButton);
+            // Add buttonBox to your layout here if necessary
+        }
+
         loadQuestions();
         initializeTimer();
         immediateAnswerEnabled = prefs.getBoolean("immediateAnswerEnabled", false);
         updateButtonVisibility();
         displayQuestion();
+
         if (!prefs.getBoolean("timerEnabled", true)) {
             timerLabel.setVisible(false);
             toggleTimerButton.setVisible(false);
@@ -61,13 +84,28 @@ public class QuizGameController {
         correctAnswerLabel.setVisible(false);
     }
 
+
     private void updateButtonVisibility() {
-        if (immediateAnswerEnabled) {
-            submitAnswerButton.setVisible(true);
-            nextQuestionButton.setVisible(false);
-        } else {
-            submitAnswerButton.setVisible(false);
-            nextQuestionButton.setVisible(true);
+        if (submitAnswerButton != null) {
+            submitAnswerButton.setVisible(immediateAnswerEnabled && !answerSubmitted);
+        }
+        if (nextQuestionButton != null) {
+            nextQuestionButton.setVisible(!immediateAnswerEnabled || answerSubmitted);
+        }
+        if (toggleTimerButton != null) {
+            toggleTimerButton.setVisible(prefs.getBoolean("timerEnabled", true));
+        }
+        if (exitQuizButton != null) {
+            exitQuizButton.setVisible(true);
+        }
+
+        // Update the button box
+        if (buttonBox != null) {
+            buttonBox.getChildren().clear();
+            if (submitAnswerButton != null && submitAnswerButton.isVisible()) buttonBox.getChildren().add(submitAnswerButton);
+            if (nextQuestionButton != null && nextQuestionButton.isVisible()) buttonBox.getChildren().add(nextQuestionButton);
+            if (toggleTimerButton != null && toggleTimerButton.isVisible()) buttonBox.getChildren().add(toggleTimerButton);
+            if (exitQuizButton != null && exitQuizButton.isVisible()) buttonBox.getChildren().add(exitQuizButton);
         }
     }
 
@@ -76,8 +114,8 @@ public class QuizGameController {
         if (!answerSubmitted) {
             checkAnswer();
             showCorrectAnswer();
-            submitAnswerButton.setVisible(false);
-            nextQuestionButton.setVisible(true);
+            answerSubmitted = true;
+            updateButtonVisibility();
         }
     }
 
@@ -227,6 +265,8 @@ public class QuizGameController {
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.size()) {
             displayQuestion();
+            answerSubmitted = false;
+            updateButtonVisibility();
         } else {
             finishQuiz();
         }
